@@ -8,5 +8,5 @@ seaborn
 pandas
 scipy
 ipywidgets
--r ./apriltag
+-r ./apriltag/requirements.txt
 -e ./apriltag
