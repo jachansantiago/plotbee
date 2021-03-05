@@ -1,0 +1,10 @@
+numpy
+filterpy
+matplotlib
+scikit-image
+cv2
+tqdm
+seaborn
+pandas
+scipy
+-e ./apriltag
