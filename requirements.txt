@@ -7,4 +7,5 @@ tqdm
 seaborn
 pandas
 scipy
+ipywidgets
 -e ./apriltag
