@@ -2,7 +2,7 @@ numpy
 filterpy
 matplotlib
 scikit-image
-cv2
+opencv-python
 tqdm
 seaborn
 pandas
