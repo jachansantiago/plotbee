@@ -8,4 +8,5 @@ seaborn
 pandas
 scipy
 ipywidgets
+-r ./apriltag
 -e ./apriltag
