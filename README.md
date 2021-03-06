@@ -12,3 +12,11 @@ python setup.py install
 ## Demo
 
 Try the [demo notebook](https://github.com/jachansantiago/plotbee/blob/master/notebooks/video_example.ipynb).
+
+### Sample data
+To download sample data run the following command.
+```
+./download_data
+```
+
+
