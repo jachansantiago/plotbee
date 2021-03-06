@@ -8,5 +8,5 @@ seaborn
 pandas
 scipy
 ipywidgets
--r ./apriltag/requirements.txt
--e ./apriltag
+cmake_setuptools
+#-e ./apriltag apriltag c++ code cannot be build through pip; use setup.py
