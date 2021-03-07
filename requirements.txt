@@ -7,6 +7,5 @@ tqdm
 seaborn
 pandas
 scipy
-ipywidgets
 cmake_setuptools
 #-e ./apriltag apriltag c++ code cannot be build through pip; use setup.py

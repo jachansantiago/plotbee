@@ -5,7 +5,7 @@ import random
 import numbers
 import os
 from skimage import io
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 import math
 from collections import defaultdict
 import matplotlib.pyplot as plt

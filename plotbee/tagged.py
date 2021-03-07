@@ -1,7 +1,7 @@
 from plotbee.video import Video
 from plotbee.frame import Frame
 from plotbee.body import Body
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 from plotbee.utils import read_json, save_json
 import os
 import pandas as pd

@@ -4,7 +4,7 @@ import apriltag.python.apriltagdetect as atd
 from apriltag.python.apriltagdetect import detectionsToObj
 import apriltag.python.apriltag as apriltag
 import cv2
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 import numpy as np
 from concurrent import futures
 

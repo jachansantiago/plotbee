@@ -3,7 +3,7 @@ import numpy as np
 from plotbee.sort import Sort, KalmanBoxTracker
 from plotbee.track import Track
 from collections import defaultdict
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 
 
 class IntegerIDGen():

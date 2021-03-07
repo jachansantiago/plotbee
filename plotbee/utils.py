@@ -4,7 +4,7 @@ import numpy as np
 import random
 import os
 from skimage import io
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm
 import math
 from collections import defaultdict
 import matplotlib.pyplot as plt
