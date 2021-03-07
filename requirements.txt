@@ -7,5 +7,5 @@ tqdm
 seaborn
 pandas
 scipy
-ninja
--e ./apriltag
+#ninja
+#-e ./apriltag
