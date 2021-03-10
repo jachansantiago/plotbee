@@ -14,7 +14,10 @@ python setup.py install
 To use the tag detection apriltag c++ code need to be installed. To install apriltag run the following commands:
 ```
 cd apriltag
-python setup.py install
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j4
 ```
 ## Demo
 
