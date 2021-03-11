@@ -589,7 +589,7 @@ class Video():
                     tagged.append(body)
         return tagged
 
-    def get_frame_without_untracked_body(self):
+    def get_frame_with_untracked_body(self):
         for frame in self:
             for body in frame:
                 if body.id == -1:
