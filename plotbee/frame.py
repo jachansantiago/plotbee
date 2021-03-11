@@ -10,6 +10,8 @@ import numpy as np
 
 
 class Frame():
+
+    TRACK_DIRECTION = "forward"
     
     def __init__(self, bodies, frame_id, image=None, mapping=None, parts=None):
         self._id = int(frame_id)
@@ -90,7 +92,7 @@ class Frame():
     def video_name(self):
         return self._video.video_name
 
-    def _image(self, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5):
+    def _image(self, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward"):
         frame = self.image.copy()
 
         if bbox:
@@ -109,7 +111,7 @@ class Frame():
             for body in self.bodies:
                 if len(body) < min_parts:
                     continue
-                frame = track_drawer(frame, body)
+                frame = track_drawer(frame, body, direction=track_direction)
 
         if events:
             for body in self.bodies:
@@ -143,13 +145,15 @@ class Frame():
         return frame
 
 
-    @property
-    def track_image(self):
+    def track_image(self, direction=None):
+
+        if direction is None:
+            direction = Frame.TRACK_DIRECTION
 
         frame = self.image.copy()
 
         for body in self.bodies:
-            frame = track_drawer(frame, body)
+            frame = track_drawer(frame, body, direction=direction)
         
         return frame
 

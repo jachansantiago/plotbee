@@ -42,8 +42,8 @@ def bbox(frame, idtext=False, ax=None, suppression=False):
 def skeleton(frame):
     plt.imshow(frame.skeleton_image)
 
-def tracks(frame):
-    plt.imshow(frame.track_image)
+def tracks(frame, direction="forward"):
+    plt.imshow(frame.track_image(direction=direction))
 
 def parts(frame):
     plt.imshow(frame.parts_image)
@@ -106,15 +106,26 @@ def extract_body(frame, body, width=200, height=400, cX=None, cY=None, ignore_an
     return rotate_bound2(frame,x,y,angle, width, height, cX, cY)
 
 
-def track_drawer(frame, body, thickness=3):
+def track_drawer(frame, body, thickness=3, direction="forward"):
     points = list()
     color = id2color(body.id)
     x = body
 
-    while x.next is not None:
-        p = x.center
-        points.append(np.int32(p))
-        x = x.next
+    if direction.lower() == "backward":
+        
+        while x.prev is not None:
+            p = x.center
+            points.append(np.int32(p))
+            x = x.prev
+    else:
+        if direction.lower() == "full":
+            while x.prev is not None:
+                x = x.prev
+
+        while x.next is not None:
+            p = x.center
+            points.append(np.int32(p))
+            x = x.next
 
     points = np.array([points], dtype=np.int32)
 
