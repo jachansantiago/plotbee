@@ -589,6 +589,13 @@ class Video():
                     tagged.append(body)
         return tagged
 
+    def get_frame_without_untracked_body(self):
+        for frame in self:
+            for body in frame:
+                if body.id == -1:
+                    return frame
+
+
     def export_tagged(self, output_folder, save_image=True):
         tag_bodies = self.tagged()
         _, video_name = os.path.split(self.video_path)
