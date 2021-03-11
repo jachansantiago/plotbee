@@ -186,7 +186,7 @@ class Body():
     def boundingBox(self):
         center = self.center
         angle = self.angle
-        return rotatedBoundBoxPoints(center, angle)
+        return rotatedBoundBoxPoints(center, angle, Body.width, Body.height)
 
     @property
     def skeleton(self):

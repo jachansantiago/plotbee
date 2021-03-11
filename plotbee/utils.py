@@ -111,19 +111,19 @@ def bound_box_points(p):
     return p1, p2, p3, p4
 
 
-def rotatedBoundBoxPoints(p, angle):
-    W = 100
-    HU = 200
-    HL = 200
+def rotatedBoundBoxPoints(p, angle, width, height):
+    W = width//2
+    H = height//2
+
     x, y = p
     if angle == -1:
         angle = 0
     angle = math.radians(angle)
     x, y = int(x), int(y)
-    p1 = x - W, y - HU
-    p2 = x + W, y - HU
-    p3 = x + W, y + HL
-    p4 = x - W, y + HL
+    p1 = x - W, y - H
+    p2 = x + W, y - H
+    p3 = x + W, y + H
+    p4 = x - W, y + H
     
     p1 = rotate_around_point(p1, angle, (x,y))
     p2 = rotate_around_point(p2, angle, (x,y))
@@ -131,6 +131,23 @@ def rotatedBoundBoxPoints(p, angle):
     p4 = rotate_around_point(p4, angle, (x,y))
 
     return p1, p2, p3, p4
+
+def pointInRotatedBbox(p, center, angle, width, height):
+
+    angle = math.radians(angle)
+    rotated_p = rotate_around_point(p, -angle, center)
+
+    W = width//2
+    H = height//2
+    
+
+    x, y = center
+    rx, ry = rotated_p
+
+    if rx >= x - W and rx <= x + W and ry >= y - H and ry <= y + H:
+        return True
+    return False 
+
 
 
 def plot_bounding_box(frame, p, color):

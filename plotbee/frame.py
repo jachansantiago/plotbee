@@ -2,11 +2,13 @@ from plotbee.videoplotter import bbox_drawer, skeleton_drawer, track_drawer
 from plotbee.videoplotter import parts_drawer, event_track_drawer
 from plotbee.videoplotter import extract_body
 from plotbee.utils import rotate_bound2
+from plotbee.utils import pointInRotatedBbox
 import os
 from skimage import io
 from functools import lru_cache
 from plotbee.body import Body
 import numpy as np
+import warnings
 
 
 class Frame():
@@ -232,7 +234,21 @@ class Frame():
         return len(self.bodies)
 
     def __getitem__(self, index):
-        return self.bodies[index]     
+        return self.bodies[index]
+
+    def bodies_at_point(self, p, silent=False):
+        bodies = list()
+
+        for body in self:
+            if pointInRotatedBbox(p, body.center, body.angle, body.width, body.height):
+                bodies.append(body)
+
+        if not silent:
+            if len(bodies) > 1:
+                warnings.warn("More than one body in {} point.".format(p))
+
+
+        return bodies  
 
         
     def save(self, folder, skeleton=True, bbox=True, tracks=False, events=True, min_parts=-1):
