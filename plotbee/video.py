@@ -182,6 +182,15 @@ def image_from_video(video_path, frameid):
     return im
 
 
+def get_video(video_path, start=0):
+
+    video = cv2.VideoCapture(video_path)
+
+    video.set(cv2.CAP_PROP_POS_FRAMES, start)
+
+    return video
+
+
 
 
 def process_video(frames, video_path, start, end, img_folder, file_format, lock, pbar):
@@ -366,6 +375,10 @@ class Video():
     
     def _get_frame(self, frame_id):
         return self._frames[frame_id]
+    
+    
+    def get_video_stream(self, start=0):
+        return get_video(self.video_path, start=start)
 
 
     def __repr__(self):

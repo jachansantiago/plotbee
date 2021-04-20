@@ -192,9 +192,9 @@ class Frame():
 
     def extract_patch(self, x, y, angle=0, width=160, height=320, cX=None, cY=None):
         return rotate_bound2(self.image, x, y, angle, width, height, cX, cY)
-
-
-    def bodies_images(self, width=None, height=None, cX=None, cY=None, suppression=False, min_parts=-1):
+    
+    @staticmethod
+    def _extract_bodies_images(image, frame_data, width=None, height=None, cX=None, cY=None, suppression=False, min_parts=-1):
 
         if width is None:
             width = Body.width
@@ -204,23 +204,27 @@ class Frame():
             cX = Body.cX
         if cY is None:
             cY = Body.cY
-
-        frame = self.image
+        
         images =list()
         bodies = list()
 
 
-        for body in self:
+        for body in frame_data:
             if suppression and not body.valid:
                 continue
 
             if len(body) < min_parts:
                 continue
-            cbodyimg = extract_body(frame, body, width=width, 
+            cbodyimg = extract_body(image, body, width=width, 
                                     height=height, cX=cX, cY=cY)
             images.append(cbodyimg)
             bodies.append(body)
         return bodies, np.array(images)
+        
+
+
+    def bodies_images(self, width=None, height=None, cX=None, cY=None, suppression=False, min_parts=-1):
+        return self._extract_bodies_images(self.image, self)
 
     
     
