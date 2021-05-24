@@ -27,6 +27,142 @@ from plotbee.events import track_classification
 from plotbee.tag import detect_tags_on_video
 from plotbee.tag import match_tags
 from plotbee.videoplotter import extract_body
+# from plotbee.pollen import process_pollen 
+
+# from plotbee.utils import divide_video, merge_videos
+from tensorflow.keras.models import model_from_json
+import tensorflow as tf
+import multiprocessing as mp
+
+
+SIZE=(375, 450)
+
+    
+def divide_video(video, fname, N):
+    frames = len(video)
+    batch = frames//N
+    
+    fpath, ext = os.path.splitext(fname)
+    
+    filenames = list()
+    
+    for i in range(N):
+        start = i * batch
+        end = (i + 1) * batch
+        if end > frames:
+            end = frames
+            
+        v = video[start:end]
+        
+        path = fpath + "_" + str(i) + ext
+        v.save(path)
+        
+        filenames.append(path)
+    return filenames
+
+
+def merge_videos(video_names):
+    
+    v = Video.load(video_names[0])
+    
+    folder, file = os.path.split(video_names[0])
+    
+    pfname, ext = os.path.splitext(file)
+    
+    pfname = "_".join(pfname.split("_")[:-1]) + ext
+    
+    for pname in video_names[1:]:
+        vi = Video.load(pname)
+        v.append(vi)
+
+    out_filename = os.path.join(folder, pfname)
+    v.save(out_filename)
+    return out_filename 
+    
+
+
+def load_model(json_file):
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+    return model_from_json(data)
+
+
+def preprocess_input(image):
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+#     image = cv2.resize(image, SIZE)
+    image = cv2.normalize(image,dst=image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    return image
+
+def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fraction, model_size=2048):
+    
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+    os.environ["CUDA_VISIBLE_DEVICES"]=gpu
+        
+    physical_devices = tf.config.list_physical_devices('GPU')
+    print(physical_devices, gpu)
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    tf.config.experimental.set_virtual_device_configuration(physical_devices[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=model_size)])
+    
+    folder = '/'.join(video_filename.split('/')[:-1])
+    
+    model = load_model(model_path)
+    model.load_weights(weigths_path)
+
+    video_data = Video.load(video_filename)
+    start = video_data[0].id
+#     print(start)
+    video = video_data.get_video_stream(start=start)
+    data = list()
+
+    Body.width=375
+    Body.height=450
+    
+    for i, frame in enumerate(tqdm(video_data, desc=video_filename)):
+        ret, im = video.read()
+        im = preprocess_input(im)
+        bodies, images = Frame._extract_bodies_images(im, frame)
+        images = images/255.
+        try:
+            score=model.predict_on_batch(images)
+        except:
+#             print(images.shape)
+#             print(frame)
+            continue
+        for body, pscore in zip(bodies, score):
+            body.pollen_score = float(pscore[1])
+
+    video.release()
+    
+    video_data.save(video_filename)
+    
+    return    
+
+def process_pollen(video, model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048):
+    
+    tmp_folder = "pollen_temp"
+    os.makedirs(tmp_folder, exist_ok=True)
+    pollen_path = os.path.join(tmp_folder, "pollen_temp.json")
+    
+    frames = len(video)
+    
+    processes = dict()
+    
+    # Divide current video into N temp_files
+    filenames = divide_video(video, pollen_path, workers)
+    
+    # Process each file with pollen classification
+    for i, file in enumerate(filenames):
+        gpu = gpus[i % len(gpus)]
+        processes[file] = mp.Process(target=tfv2_pollen_classifier,args= (file, model_path, model_weights, gpu, (1*len(gpus))/workers, model_size))
+        processes[file].start()
+
+    for k in processes:
+        processes[k].join()
+    
+    # Merge files
+    fname = merge_videos(filenames)
+    
+    return Video.load(fname)
 
 
 
@@ -346,7 +482,8 @@ class Video():
         for frame in self._frames:
             frame.set_video(self)
 
-        self._config = config       
+        self._config = config
+        
         
     @property
     def config(self):
@@ -630,6 +767,17 @@ class Video():
 
         save_json(json_path, tagged_json)
         
+        return
+    
+    def process_pollen(self,  model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048):
+        pollen_video = process_pollen(self, model_path, model_weights, workers=workers, gpus=gpus, model_size=model_size)
+        
+        self._frames = pollen_video._frames
+        self._tracks = pollen_video._tracks
+        for frame in self._frames:
+            frame.set_video(self)
+            
+        self._config = pollen_video._config
         return
 
 

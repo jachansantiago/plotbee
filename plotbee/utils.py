@@ -234,3 +234,45 @@ def trackevent2color(track):
     else:
         return None
     
+    
+# def divide_video(video, fname, N):
+#     frames = len(video)
+#     batch = frames//N
+    
+#     fpath, ext = os.path.splitext(fname)
+    
+#     filenames = list()
+    
+#     for i in range(N):
+#         start = i * batch
+#         end = (i + 1) * batch
+#         if end > frames:
+#             end = frames
+            
+#         v = video[start:end]
+        
+#         path = fpath + "_" + str(i) + ext
+#         v.save(path)
+        
+#         filenames.append(path)
+#     return filenames
+
+
+# def merge_videos(video_names):
+    
+#     v = Video.load(video_names[0])
+    
+#     folder, file = os.path.split(video_names[0])
+    
+#     pfname, ext = os.path.splitext(file)
+    
+#     pfname = "_".join(pfname.split("_")[:-1]) + ext
+    
+#     for pname in pollen_names[1:]:
+#         vi = Video.load(pname)
+#         v.append(vi)
+
+#     out_filename = os.path.join(folder, pfname)
+#     v.save(out_filename)
+#     return out_filename 
+    
