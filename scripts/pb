@@ -1,0 +1,136 @@
+#!/usr/bin/env python
+import argparse
+import os
+from plotbee.video import Video
+
+# sub-command functions
+def tracking(args):
+    input_filename = args.file
+    method = args.method
+    path, filename = os.path.split(input_filename)
+    output_filename = os.path.join(path, method + "_" + filename)
+    
+    print("Loading video data.")
+    video = Video.load(input_filename)
+    
+    if method == "hungarian":
+        print("Hungarian Tracking.")
+        video.hungarian_tracking()
+    elif method == "sort":
+        print("Sort Tracking.")
+        video.sort_tracking()
+
+    print("Saving video on {}.".format(output_filename))
+    video.save(output_filename)
+    print("Video saved.")
+
+def pollen(args):
+    input_filename = args.file
+    input_video = args.video
+    model_path = args.model_json
+    weights = args.weights
+    workers = args.workers
+
+    path, filename = os.path.split(input_filename)
+    output_filename = os.path.join(path, "pollen_" + filename)
+    
+    print("Loading video data.")
+    video = Video.load(input_filename)
+    video.load_video(input_video)
+
+    print("Pollen Detection.")
+    video.process_pollen(model_path, weights, workers=workers)
+
+    print("Saving video on {}.".format(output_filename))
+    video.save(output_filename)
+    print("Video saved.")
+
+def tags(args):
+    input_filename = args.file
+    input_video = args.video
+    method = args.method
+    tags_file = args.tags_file
+
+    path, filename = os.path.split(input_filename)
+    output_filename = os.path.join(path, "tags_" + filename)
+
+    print("Loading video data.")
+    video = Video.load(input_filename)
+
+    if method == "merge":
+        print("Loading tag data.")
+        video.load_tags(tags_file)
+    elif method == "compute":
+        print("Computing tag data.")
+        video.load_video(input_video)
+        video.tag_detection()
+
+    print("Saving video on {}.".format(output_filename))
+    video.save(output_filename)
+    print("Video saved.")
+
+def skeleton(args):
+    input_filename = args.file
+    input_video = args.video
+    input_format = args.format
+
+    path, filename = os.path.split(input_filename)
+    output_filename = os.path.join(path, "skeleton_" + filename)
+
+    if input_format == "beepose":
+        config = dict()
+        config['DETECTIONS_PATH'] = input_filename
+        config['VIDEO_PATH'] = input_video
+        print("Beepose to Plotbee Convertion.")
+        video = Video.from_config(config)
+
+    print("Saving video on {}.".format(output_filename))
+    video.save(output_filename)
+    print("Video saved.")
+
+
+
+
+
+
+# create the top-level parser
+parser = argparse.ArgumentParser()
+subparsers = parser.add_subparsers()
+
+# create the parser for the "tracking" command
+parser_tracking = subparsers.add_parser('tracking')
+parser_tracking.add_argument('-f', '--file', type=str, required=True)
+parser_tracking.add_argument('--method', type=str, default="hungarian")
+parser_tracking.set_defaults(func=tracking)
+
+# create the parser for the "pollen" command
+parser_tracking = subparsers.add_parser('pollen')
+parser_tracking.add_argument('-f', '--file', type=str, required=True)
+parser_tracking.add_argument('-v', '--video', type=str, default=None)
+parser_tracking.add_argument('--model_json', type=str, required=True)
+parser_tracking.add_argument('--weights', type=str, required=True)
+parser_tracking.add_argument('--workers', type=int, default=4)
+parser_tracking.set_defaults(func=pollen)
+
+# create the parser for the "tags" command
+parser_tracking = subparsers.add_parser('tags')
+parser_tracking.add_argument('-f', '--file', type=str, required=True)
+parser_tracking.add_argument('-v', '--video', type=str, default=None)
+parser_tracking.add_argument('--method', type=str, default="merge")
+parser_tracking.add_argument('-t', '--tags_file', type=str, default=None)
+parser_tracking.set_defaults(func=tags)
+
+# create the parser for the "skeleton" command
+parser_tracking = subparsers.add_parser('skeleton')
+parser_tracking.add_argument('-f', '--file', type=str, required=True)
+parser_tracking.add_argument('-v', '--video', type=str, default=None)
+parser_tracking.add_argument('--format', type=str, default="beepose")
+parser_tracking.set_defaults(func=skeleton)
+
+#parse the args and call whatever function was selected
+args = parser.parse_args()
+args.func(args)
+
+# # parse the args and call whatever function was selected
+# args = parser.parse_args('bar XYZYX'.split())
+# args.func(args)

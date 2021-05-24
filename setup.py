@@ -7,6 +7,7 @@ setuptools.setup(
     name="plotbee",
     version="0.0.1",
     packages=setuptools.find_packages(),
+    scripts=['scripts/pb'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
