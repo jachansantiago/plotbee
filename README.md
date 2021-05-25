@@ -1,5 +1,5 @@
 # plotbee
-This project is library for plotting Beepose detections
+Plotbee is library for plotting Beepose detections
 
 ## Installation
 
@@ -30,16 +30,21 @@ pb pollen --file data/C02_170622120000_skeleton.json --video data/C02_1706221200
 ```
 This command produces an `output_file = data/pollen_merged_C02_170622120000_detections.json`.
 
+|   Workers     | Time          |  Memory  |
+| ------------- | ------------- | -------- |
+|       4       |    ~50 min    |    8GB   |
+|       8       |   not yet     |    16GB  |
+
 ### Tag Detetction
 
-Tags sub-command can compute or merge tag detections. Use `--method compute` to perform the tag detection with AprilTags. Note that tag detection requires images from the video. Be sure that the skeleton file contains the right localization of the video. Alternatively, the video location can be modified with `--video`.
+Tags sub-command can compute or merge tag detections. Use `--compute` to perform the tag detection with AprilTags. Note that tag detection requires images from the video. Be sure that the skeleton file contains the right localization of the video. Alternatively, the video location can be modified with `--video`.
 #### Compute
 ```
 pb tags --file data/C02_170622120000_skeleton.json --video data/C02_170622120000.mp4 --compute
 ```
 
 #### merge
-Use `--method merge` and `--tags_file` to combine tag detection previously computed into a plotbee format video. Note that `pb tags` requires one of this options `--compute` or `--merge` to run. 
+Use `--merge` and `--tags_file` to combine previously computed detections into a plotbee format video. Note that `pb tags` requires one of this options `--compute` or `--merge` to run. 
 ```
 pb tags --file data/C02_170622120000_skeleton.json --tags_file Tags-C02_170622120000.json --merge
 ```
@@ -61,6 +66,14 @@ pb pipeline --skeleton --file merged_C02_170622120000_detections.json --video C0
 --tags --tags_file Tags-C02_170622120000.json --method merge \
 --tracking --method hungarian
 ```
+
+### Dataset export
+
+`pb export` create pollen and tag dataset from videos in plotbee format. The options `--pollen` and `--tags` (not implemented yet) are mutually exclusive. Image dimensions `--width` and `--height` are required fields. A fixed `--size` dataset is supported and returns a balanced dataset. `size//2` images with the highest pollen scores and `size//2` images with the lowest pollen scores. If `--size` is not provided the whole video will be exported. `--output_folder` is also required.
+```
+pb export --pollen --output_folder pollen_data --file test_cli/pollen_tags_skeleton_merged_C02_170628120000_detections.json --width 375 --height 450 --size 200
+```
+
 
 ## Demo
 
