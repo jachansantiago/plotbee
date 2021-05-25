@@ -1,6 +1,7 @@
 
+from scipy import stats
 
-def track_classification(video, inside=200, outside=1200, threshold=5):
+def track_classification(video, inside=200, outside=1200, threshold=5, pollen_score="mode", tag="mode"):
 
     for track in video.tracks.values():
         _, start = track.start.center
@@ -55,11 +56,27 @@ def track_classification(video, inside=200, outside=1200, threshold=5):
             track.track_shape = 'noise'
 
         body = track.start
+        pollen_count = 0
+        pollen_sum = 0
+        tags = list()
         while body.next is not None:
             if body.pollen:
-                track.pollen = True
-                break
+                pollen_count += 1
+            pollen_sum += body.pollen_score
+            if body.tag != None:
+                tags.append(body.tag)
             body = body.next
+
+        if pollen_score == "mode":
+            track.pollen_score = pollen_count/len(track)
+        elif pollen_score == "average":
+            track.pollen_score = pollen_sum/len(track)
+
+        if tag == "mode":
+            tids = list()
+            for t in tags:
+                tids.append(t["id"])
+            track._tag = stats.mode(tids)
 
 
 

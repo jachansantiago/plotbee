@@ -10,52 +10,11 @@ class Track():
         self._end = b
         self._event = None
         self._track_shape = None
-        self.pollen = False
+        self.pollen_score = 0.0
         self._tag = None
-        self.tags_loaded = False
-
-        # self.init()
-        
-
-    def init(self):
-        self._tags = list()
-        b = self._start
-
-        if b.tag is not None:
-            self._tags.append(b.tag)
-
-        while b.next is not None:
-            b = b.next
-            if b.tag is not None:
-                self._tags.append(b.tag)
-            
-        
-        if len(self._tags) > 0:
-            self._tag = self._tags[0]
-
-        self.tags_loaded = True
-
-    @property
-    def tags(self):
-
-        if not self.tags_loaded:
-
-            self._tags = list()
-            b = self._start
-
-            while b.next is not None:
-                b = b.next
-                if b.tag is not None:
-                    self._tags.append(b.tag)
-            self.tags_loaded = True
-
-
-        return self._tags
 
     @property
     def tag(self):
-        if len(self.tags) > 0:
-            self._tag = self.tags[0]
         return self._tag
 
     @property

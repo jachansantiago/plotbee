@@ -7,6 +7,7 @@ import cv2
 from tqdm import tqdm
 import numpy as np
 from concurrent import futures
+# from plotbee.body import Body
 
 def dist(a, b):
     npa = np.array([a])
@@ -59,20 +60,27 @@ def match_tag2body(frame, tag, min_dist=50):
     return
 
 # This functions is used for  merge tag file into skeleton file
-def match_tags(frame, tag_list, th_dist=50):
+# def match_tags(frame, tag_list, th_dist=50):
     
-    for tag in tag_list:
-        min_dist = th_dist
-        closest_body = None
-        for body in frame:
-            if body.tag is not None:
-                continue
-            d = dist(body.center, tag['c'])
-            if d < min_dist:
-                min_dist = d
-                closest_body = body
-        if closest_body is not None:
-            closest_body.tag = tag
+#     for tag in tag_list:
+#         min_dist = th_dist
+#         closest_body = None
+#         for body in frame:
+#             if body.tag is not None:
+#                 continue
+#             d = dist(body.center, tag['c'])
+#             if d < min_dist:
+#                 min_dist = d
+#                 closest_body = body
+#         if closest_body is not None:
+#             closest_body.tag = tag
+#         else:
+#             # Add new body with the tag as thorax
+#             x, y = tag['c']
+#             body = Body({3: [(x,y)]}, center=3,
+#                         connections=[],angle_conn=[3,3],
+#                         frame=frame,tag=tag,body_id=-1)
+#             frame.append(body)
 
 
 def detect_tags_on_frame(det, frame):

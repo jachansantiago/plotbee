@@ -25,7 +25,7 @@ from plotbee.utils import save_json
 from plotbee.tracking import hungarian_tracking, sort_tracking, non_max_supression_video
 from plotbee.events import track_classification
 from plotbee.tag import detect_tags_on_video
-from plotbee.tag import match_tags
+# from plotbee.tag import match_tags
 from plotbee.videoplotter import extract_body
 # from plotbee.pollen import process_pollen 
 
@@ -383,7 +383,37 @@ def process_frame_consumer(video_path, q, lock, pbar):
     video.release()
     with lock:
         print(' Exit Consumer => {}'.format(os.getpid()))
-    return 
+    return
+
+
+def dist(a, b):
+    npa = np.array([a])
+    npb = np.array([b])
+
+    return np.sqrt(np.sum((npa - npb)**2))
+
+
+def match_tags(frame, tag_list, th_dist=50):
+    
+    for tag in tag_list:
+        min_dist = th_dist
+        closest_body = None
+        for body in frame:
+            if body.tag is not None:
+                continue
+            d = dist(body.center, tag['c'])
+            if d < min_dist:
+                min_dist = d
+                closest_body = body
+        if closest_body is not None:
+            closest_body.tag = tag
+        else:
+            # Add new body with the tag as thorax
+            x, y = tag['c']
+            body = Body({3: [(x,y)]}, center=3,
+                        connections=[],angle_conn=[3,3],
+                        frame=frame,tag=tag,body_id=-1)
+            frame.update([body])
 
 
 
