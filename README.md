@@ -30,6 +30,8 @@ pb pollen --file data/C02_170622120000_skeleton.json --video data/C02_1706221200
 ```
 This command produces an `output_file = data/pollen_merged_C02_170622120000_detections.json`.
 
+Benchmark for one hour video.
+
 |   Workers     | Time          |  Memory  |
 | ------------- | ------------- | -------- |
 |       4       |    ~50 min    |    8GB   |
