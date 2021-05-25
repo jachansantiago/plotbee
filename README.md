@@ -13,7 +13,7 @@ python setup.py install
 ## Command Line
 
 ### Skeleton
-The skeleton sub-command converts beepose and SLEAP detections into plotbee format. `beepose` is the default method. Note that if the video is given at this step, no need to input it at the next steps; meanwhile, the video location does not change.
+The skeleton sub-command converts beepose and SLEAP (not implemented yet) detections into plotbee format. `beepose` is the default method. Note that if the video is given at this step, no need to input it at the next steps; meanwhile, the video location does not change.
 
 ```
 pb skeleton --file merged_C02_170622120000_detections.json --video C02_170622120000.mp4 --method beepose
