@@ -32,16 +32,16 @@ This command produces an `output_file = data/pollen_merged_C02_170622120000_dete
 
 ### Tag Detetction
 
-Tags sub-command can compute or merge tag detections. Use `--method compute` to perform the tag detection with AprilTags. Note that tag detection requires images from the video. Be sure that the skeleton file contains the right localization of the video. Alternatively, the video location can be modified with `--video'.
+Tags sub-command can compute or merge tag detections. Use `--method compute` to perform the tag detection with AprilTags. Note that tag detection requires images from the video. Be sure that the skeleton file contains the right localization of the video. Alternatively, the video location can be modified with `--video`.
 #### Compute
 ```
-pb tags --file data/C02_170622120000_skeleton.json --video data/C02_170622120000.mp4 --method compute
+pb tags --file data/C02_170622120000_skeleton.json --video data/C02_170622120000.mp4 --compute
 ```
 
 #### merge
-Use `--method merge` and `--tags_file` to combine tag detection previously computed into a plotbee format video.
+Use `--method merge` and `--tags_file` to combine tag detection previously computed into a plotbee format video. Note that `pb tags` requires one of this options `--compute` or `--merge` to run. 
 ```
-pb tags --file data/C02_170622120000_skeleton.json --tags_file Tags-C02_170622120000.json --method merge
+pb tags --file data/C02_170622120000_skeleton.json --tags_file Tags-C02_170622120000.json --merge
 ```
 Both commands produces an `output_file = data/tags_C02_170622120000_detections.json`.
 
