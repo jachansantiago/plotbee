@@ -62,6 +62,13 @@ pb pipeline --skeleton --file merged_C02_170622120000_detections.json --video C0
 --tracking --method hungarian
 ```
 
+### Dataset export
+
+`pb export` create pollen and tag dataset from videos in plotbee format. The options `--pollen` and `--tags` (not implemented yet) are mutually exclusive. Image dimensions `--width` and `--height` are required fields. A fixed `--size` dataset is supported and returns a balanced dataset. If `--size` is not provided the whole video will be exported. `--output_folder` is also required.
+```
+pb export --pollen --output_folder pollen_data --file test_cli/pollen_tags_skeleton_merged_C02_170628120000_detections.json --width 375 --height 450 --size 200
+```
+
 ## Demo
 
 Try the [demo notebook](https://github.com/jachansantiago/plotbee/blob/master/notebooks/video_example.ipynb).
