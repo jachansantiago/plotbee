@@ -30,6 +30,11 @@ pb pollen --file data/C02_170622120000_skeleton.json --video data/C02_1706221200
 ```
 This command produces an `output_file = data/pollen_merged_C02_170622120000_detections.json`.
 
+|   Workers     | Time          |  Memory  |
+| ------------- | ------------- | -------- |
+|       4       |    ~50 min    |    8GB   |
+|       8       |   not yet     |    16GB  |
+
 ### Tag Detetction
 
 Tags sub-command can compute or merge tag detections. Use `--compute` to perform the tag detection with AprilTags. Note that tag detection requires images from the video. Be sure that the skeleton file contains the right localization of the video. Alternatively, the video location can be modified with `--video`.
