@@ -43,6 +43,15 @@ pb tags --file data/C02_170622120000_skeleton.json --tags_file Tags-C02_17062212
 pb tracking --file data/C02_170622120000_skeleton.json --method hungarian
 ```
 
+### Full Pipeline
+```
+pb pipeline --skeleton --file merged_C02_170622120000_detections.json --video C02_170622120000 --method beepose \
+--pollen --model_json 2l_model_2020_angle_auto_compensated1.json \
+--weights 2l_model_2020_angle_auto_compensated1.h5 \
+--tags --tags_file Tags-C02_170622120000.json --method merge \
+--tracking --method hungarian
+```
+
 ## Demo
 
 Try the [demo notebook](https://github.com/jachansantiago/plotbee/blob/master/notebooks/video_example.ipynb).
