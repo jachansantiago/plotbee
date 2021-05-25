@@ -46,7 +46,7 @@ pb tags --file data/C02_170622120000_skeleton.json --tags_file Tags-C02_17062212
 Both commands produces an `output_file = data/tags_C02_170622120000_detections.json`.
 
 ### Tracking
-Tracking just requires the `--method`. The method can be `hungarian` or `sort`.
+Tracking just requires the `--method`. The method can be `hungarian` (default) or `sort`.
 ```
 pb tracking --file data/C02_170622120000_skeleton.json --method hungarian
 ```
