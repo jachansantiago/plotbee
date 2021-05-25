@@ -1,5 +1,5 @@
 # plotbee
-This project is library for plotting Beepose detections
+Plotbee is library for plotting Beepose detections
 
 ## Installation
 
