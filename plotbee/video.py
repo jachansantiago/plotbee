@@ -798,6 +798,57 @@ class Video():
         save_json(json_path, tagged_json)
         
         return
+
+    def export_pollen(self, output_folder, limit=None):
+        bodies = [body for frame in self for body in frame]
+        bodies = sorted(bodies, key=(lambda b: b.pollen_score))
+
+        if limit:
+            bodies = bodies[:limit//2] + bodies[-limit//2:]
+
+        _, video_name = os.path.split(self.video_path)
+        video_name, ext = os.path.splitext(video_name)
+        out_path = os.path.join(output_folder, video_name)
+        os.makedirs(out_path, exist_ok=True)
+        
+        pollen_path = os.path.join(out_path, "P")
+        os.makedirs(pollen_path, exist_ok=True)
+        
+        nopollen_path = os.path.join(out_path, "NP")
+        os.makedirs(nopollen_path, exist_ok=True)
+
+        pollen_csv = os.path.join(out_path, "pollen.csv")
+
+        fnames = list()
+        pollen_scores = list()
+        xs = list()
+        ys = list()
+
+        for body in tqdm(bodies):
+            x, y = body.center
+            pollen_score = body.pollen_score
+            fname = "{:09}_X{:04}_Y{:04}.jpg".format(body.frameid, x, y)
+            if pollen_score < 0.5:
+                fpath = os.path.join(nopollen_path, fname)
+            else:
+                fpath = os.path.join(pollen_path, fname)
+            
+            fnames.append(fpath)
+            pollen_scores.append(pollen_score)
+            xs.append(x)
+            ys.append(y)
+            body.save(fpath)
+            
+        df_dict = {
+            "filename":fnames,
+            "pollen": pollen_scores,
+            "x":xs,
+            "y":ys
+        }
+        df = pd.DataFrame(df_dict)
+        df.to_csv(pollen_csv, index=False)
+        
+        return
     
     def process_pollen(self,  model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048):
         pollen_video = process_pollen(self, model_path, model_weights, workers=workers, gpus=gpus, model_size=model_size)

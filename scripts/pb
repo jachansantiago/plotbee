@@ -2,6 +2,7 @@
 import argparse
 import os
 from plotbee.video import Video
+from plotbee.body import Body
 
 # sub-command functions
 def tracking(args):
@@ -115,8 +116,21 @@ def pipeline(args):
     if args.tracking:
         tracking(args)
 
+def export(args):
+    input_filename = args.file
+    output_folder = args.output_folder
+    pollen = args.pollen
+    limit = args.size
+    width = args.width
+    height = args.height
 
+    print("Loading video data.")
+    video = Video.load(input_filename)
+    Body.width = width
+    Body.height = height
 
+    if pollen:
+        video.export_pollen(output_folder, limit=limit)
 
 
 # create the top-level parser
@@ -158,7 +172,7 @@ parser_tracking.add_argument('--method', type=str, default="hungarian")
 parser_tracking.set_defaults(func=tracking)
 
 
-# create the parser for the "tracking" command
+# create the parser for the "pipeline" command
 parser_pipeline = subparsers.add_parser('pipeline')
 parser_pipeline.add_argument('--skeleton', action='store_true')
 parser_pipeline.add_argument('-f', '--file', type=str, required=True)
@@ -179,6 +193,18 @@ parser_pipeline.add_argument('-t', '--tags_file', type=str, default=None)
 parser_pipeline.add_argument('--tracking', action='store_true')
 parser_pipeline.add_argument('--method', type=str, default="hungarian")
 parser_pipeline.set_defaults(func=pipeline)
+
+# create the parser for the "export" command
+parser_export = subparsers.add_parser('export')
+parser_export.add_argument('-f', '--file', type=str, required=True)
+parser_export.add_argument('-o', '--output_folder', type=str, required=True)
+parser_export.add_argument('-s', '--size', type=int, default=None)
+parser_export.add_argument('--width', type=int, required=True)
+parser_export.add_argument('--height', type=int, required=True)
+datatype = parser_export.add_mutually_exclusive_group(required=True)
+datatype.add_argument('--pollen', action='store_true')
+datatype.add_argument('--tags', action='store_false')
+parser_export.set_defaults(func=export)
 
 #parse the args and call whatever function was selected
 args = parser.parse_args()
