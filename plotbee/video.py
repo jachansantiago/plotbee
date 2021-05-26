@@ -492,8 +492,8 @@ class Video():
             frameobj.update(bodies)
             frames.append(frameobj)
             
-        for i, tr in track_dict.items():
-            tr.init()
+        # for i, tr in track_dict.items():
+        #     tr.init()
 
         return cls(frames, track_dict, config)
 
@@ -802,6 +802,14 @@ class Video():
     def export_pollen(self, output_folder, limit=None):
         bodies = [body for frame in self for body in frame]
         bodies = sorted(bodies, key=(lambda b: b.pollen_score))
+
+        def valid(body):
+            x, y = body.center
+            if (x > 500 and  x < 2100) and (y > 500 and  y < 800):
+                return True
+            return False
+
+        bodies = [body for body in bodies if valid(body)]
 
         if limit:
             bodies = bodies[:limit//2] + bodies[-limit//2:]
