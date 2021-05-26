@@ -80,7 +80,7 @@ pb export --pollen --output_folder pollen_data --file test_cli/pollen_tags_skele
 
 Use `--coco` to export plotbee video format into COCO format. `--width` and `--height` specifies the bounding box dimmension for the COCO keypoint annotation protocol. Use `--images` to activate image extraction. The image extraction can take a while to process a one hour video. 
 ```
-pb export --coco --file \skeleton_merged_C02_170628120000_detections.json --output_folder coco --width 300 --height 450 --images
+pb export --coco --file skeleton_merged_C02_170628120000_detections.json --output_folder coco --width 300 --height 450 --images
 ```
 
 
