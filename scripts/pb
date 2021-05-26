@@ -3,6 +3,7 @@ import argparse
 import os
 from plotbee.video import Video
 from plotbee.body import Body
+from plotbee.export import video2coco
 
 # sub-command functions
 def tracking(args):
@@ -120,17 +121,30 @@ def export(args):
     input_filename = args.file
     output_folder = args.output_folder
     pollen = args.pollen
+    tags = args.tags
+    coco = args.coco
+    images = args.images
     limit = args.size
     width = args.width
     height = args.height
 
-    print("Loading video data.")
-    video = Video.load(input_filename)
+    
     Body.width = width
     Body.height = height
 
     if pollen:
+        print("Loading video data.")
+        video = Video.load(input_filename)
         video.export_pollen(output_folder, limit=limit)
+
+    if tags:
+        pass
+        # Todo
+    
+    if coco:
+        video2coco(input_filename, output_folder, image_extraction=images,
+                     width=width, height=height)
+
 
 
 # create the top-level parser
@@ -201,9 +215,11 @@ parser_export.add_argument('-o', '--output_folder', type=str, required=True)
 parser_export.add_argument('-s', '--size', type=int, default=None)
 parser_export.add_argument('--width', type=int, required=True)
 parser_export.add_argument('--height', type=int, required=True)
+parser_export.add_argument('--images', action='store_true')
 datatype = parser_export.add_mutually_exclusive_group(required=True)
 datatype.add_argument('--pollen', action='store_true')
-datatype.add_argument('--tags', action='store_false')
+datatype.add_argument('--tags', action='store_true')
+datatype.add_argument('--coco', action='store_true')
 parser_export.set_defaults(func=export)
 
 #parse the args and call whatever function was selected
