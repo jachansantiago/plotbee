@@ -3,7 +3,7 @@ import argparse
 import os
 from plotbee.video import Video
 from plotbee.body import Body
-from plotbee.export import video2coco
+from plotbee.export import video2coco, sleap2pb
 
 # sub-command functions
 def tracking(args):
@@ -90,9 +90,12 @@ def skeleton(args):
         print("Beepose to Plotbee Convertion.")
         video = Video.from_config(config)
 
-    print("Saving video on {}.".format(output_filename))
-    video.save(output_filename)
-    print("Video saved.")
+        print("Saving video on {}.".format(output_filename))
+        video.save(output_filename)
+        print("Video saved.")
+    elif input_format == "sleap":
+        sleap2pb(input_filename)
+
 
 
 def pipeline(args):

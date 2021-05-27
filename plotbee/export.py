@@ -5,6 +5,7 @@ from skimage import io
 import os
 import cv2
 from tqdm import tqdm
+from collections import defaultdict
 
 def get_full_skeleton(video):
     max_part_body = []
@@ -160,4 +161,100 @@ def video2coco(video_fname, output_folder, image_extraction=False, width=300, he
         os.makedirs(output_folder_images,exist_ok=True)
         
         extract_images(output_folder_images, video)
+    return
+   
+# sleap
+
+def parse_videos(videos):
+    parsed_videos = list()
+    for video in videos:
+        parsed_videos.append(video['backend']['filename'])
+    return parsed_videos
+    
+def parse_skeletons(skeletons):
+    parsed_skeletons = list()
+    for skeleton in skeletons:
+        name = skeleton["graph"]["name"]
+        connections, keypoints = parse_skeleton(skeleton)
+        parsed_skeletons.append((connections, keypoints))
+    return parsed_skeletons
+
+def parse_skeleton(skeleton):
+    parsed_skeleton = list()
+    for link in skeleton['links']:
+        connection = (link["source"], link["target"])
+        parsed_skeleton.append(connection)
+    keypoints = list()
+    for node in skeleton["nodes"]:
+        keypoints.append(node['id'])
+    return parsed_skeleton, keypoints
+    
+def get_body(skeleton, frame_obj, skeletons):
+    parts = dict()
+    
+    for part, detection in skeleton["_points"].items():
+        points = [(int(detection['x']), int(detection['y']))]
+        parts[int(part)] = points
+        
+    center = 3
+    angle_conn=(3, 4)
+    
+    skeleton_id = int(skeleton['skeleton'])
+    connections = skeletons[skeleton_id]
+#     connections = [[1, 4], [1, 0], [4, 3], [3, 5]]
+    
+    score=None
+    
+    if 'score' in skeleton:
+        score = skeleton["score"]
+    
+    return Body(parts, center, angle_conn, connections, frame_obj, features=score)
+
+def get_frame(frame, skeletons):
+    frame_id = frame["frame_idx"]
+    frameobj = Frame([], frame_id)
+    bodies = list()
+    
+    for skeleton in frame['_instances']:
+        body = get_body(skeleton, frameobj, skeletons)
+        if 3 not in body._parts or 4 not in body._parts:
+            continue
+        bodies.append(body)
+        
+    frameobj.update(bodies)
+        
+    return frameobj
+
+def sleap2pb(sleap_json):
+    video_data = read_json(sleap_json)
+    frames = defaultdict(list)
+    track_dict = dict()
+    config = defaultdict(dict)
+    
+    skeletons = parse_skeletons(video_data["skeletons"])
+    
+    videos = parse_videos(video_data["videos"])
+    
+    for video_id, video_filename in enumerate(videos):
+        config[video_id]["VIDEO_PATH"] = video_filename
+    
+    for frame in video_data['labels']:
+        video_id = int(frame["video"])
+        frames[video_id].append(get_frame(frame, skeletons))
+        
+    for video_frames in frames.values():
+        video_frames.sort(key=lambda x: x.id)
+        
+    out_videos = list()
+    for video_frames, video_config in zip(frames.values(), config.values()):
+        out_videos.append(Video(video_frames, track_dict, video_config))
+        
+    for video in out_videos:
+        name = video.video_name
+        name, ext = os.path.splitext(name)
+        out_name = "skeleton_" + name + ".json"
+        video.save(out_name)
+        
+    return
+    
     
