@@ -122,6 +122,7 @@ def pipeline(args):
 
 def export(args):
     input_filename = args.file
+    input_video = args.video
     output_folder = args.output_folder
     pollen = args.pollen
     tags = args.tags
@@ -139,11 +140,17 @@ def export(args):
     if pollen:
         print("Loading video data.")
         video = Video.load(input_filename)
+        if input_video != None:
+            video.load_video(input_video)
         video.export_pollen(output_folder, limit=limit)
 
     if tags:
-        pass
-        # Todo
+        print("Loading video data.")
+        video = Video.load(input_filename)
+        if input_video != None:
+            video.load_video(input_video)
+        print("Exporting Tags... images={}".format(images))
+        video.export_tagged(output_folder, save_images=images)
     
     if coco:
         video2coco(input_filename, output_folder, image_extraction=images,
@@ -189,7 +196,7 @@ parser_tags.add_argument('-f', '--file', type=str, required=True)
 parser_tags.add_argument('-v', '--video', type=str, default=None)
 method = parser_tags.add_mutually_exclusive_group(required=True)
 method.add_argument('--compute', action='store_true')
-method.add_argument('--merge', action='store_false')
+method.add_argument('--merge', action='store_true')
 parser_tags.add_argument('--method', type=str, default="merge")
 parser_tags.add_argument('-t', '--tags_file', type=str, default=None)
 parser_tags.set_defaults(func=tags)
@@ -216,7 +223,7 @@ parser_pipeline.add_argument('--workers', type=int, default=4)
 parser_pipeline.add_argument('--tags', action='store_true')
 method = parser_pipeline.add_mutually_exclusive_group(required=True)
 method.add_argument('--compute', action='store_true')
-method.add_argument('--merge', action='store_false')
+method.add_argument('--merge', action='store_true')
 parser_pipeline.add_argument('-t', '--tags_file', type=str, default=None)
 
 parser_pipeline.add_argument('--tracking', action='store_true')
@@ -226,6 +233,7 @@ parser_pipeline.set_defaults(func=pipeline)
 # create the parser for the "export" command
 parser_export = subparsers.add_parser('export')
 parser_export.add_argument('-f', '--file', type=str, required=True)
+parser_export.add_argument('-v', '--video', type=str, default=None)
 parser_export.add_argument('-o', '--output_folder', type=str, default=".")
 parser_export.add_argument('-s', '--size', type=int, default=None)
 parser_export.add_argument('--width', type=int, default=375)

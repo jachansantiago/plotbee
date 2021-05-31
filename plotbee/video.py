@@ -779,7 +779,7 @@ class Video():
                     return frame
 
 
-    def export_tagged(self, output_folder, save_image=True):
+    def export_tagged(self, output_folder, save_images=True):
         tag_bodies = self.tagged()
         _, video_name = os.path.split(self.video_path)
         video_name, ext = os.path.splitext(video_name)
@@ -789,13 +789,14 @@ class Video():
         json_path = os.path.join(output_folder, "{}.json".format(video_name))
         tagged_json= list()
 
-        for body in tag_bodies:
+        for body in tqdm(tag_bodies):
             tagged_json.append(body.params())
 
-            if save_image:
+            if save_images:
                 fname = "TID{:05}_F{:08}.jpg".format(body.tag_id, body.frameid)
                 fpath = os.path.join(out_path, fname)
                 body.save(fpath)
+                # print("body saved.")
             
 
         save_json(json_path, tagged_json)
