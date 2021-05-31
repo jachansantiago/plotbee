@@ -18,7 +18,7 @@ The skeleton sub-command converts beepose (`--format beepose`) and SLEAP(`--form
 ```
 pb skeleton --file merged_C02_170622120000_detections.json --video C02_170622120000.mp4 --format beepose
 ```
-This command produces an `output_file = skeleton_merged_C02_170622120000_detections.json`.
+  This command produces an `output_file = skeleton_merged_C02_170622120000_detections.json`.
 
 ### Pollen Detection
 The pollen sub-command performs pollen detection at the detection level. Model's JSON and weights are required to perform pollen detection. Pollen detection uses a parallel implementation that creates temporary files at 'pollen_temp' directory. The default amount of workers is 4. Use `CUDA_VISIBLE_DEVICES` to restrict the usage of GPU devices.
@@ -68,8 +68,9 @@ pb pipeline --skeleton --file merged_C02_170622120000_detections.json --video C0
 --tags --tags_file Tags-C02_170622120000.json --method merge \
 --tracking --method hungarian
 ```
+### Export
 
-### Dataset export
+#### Pollen Dataset export
 
 `pb export` create pollen and tag dataset from videos in plotbee format. The options `--pollen` and `--tags` (not implemented yet) are mutually exclusive. Image dimensions `--width` and `--height` are required fields. A fixed `--size` dataset is supported and returns a balanced dataset. `size//2` images with the highest pollen scores and `size//2` images with the lowest pollen scores. If `--size` is not provided the whole video will be exported. `--output_folder` is also required.
 ```
@@ -82,6 +83,16 @@ Use `--coco` to export plotbee video format into COCO format. `--width` and `--h
 ```
 pb export --coco --file skeleton_merged_C02_170628120000_detections.json --output_folder coco --width 300 --height 450 --images
 ```
+
+#### Export Analysis
+Use `--analysis` to export events for behaviour analysis. This method perform track classification for events and produce a csv file with:
+`frame`, `track_id`, `pollen_score`,`tag_id`, `track_event`, `track_tag_id`, `track_pollen_score` and `track_shape`.
+
+```
+pb export --analysis --file  hungarian_pollen_tags_skeleton_merged_C02_170628120000_detections.json
+```
+ 
+This command produces an `output_file = analysis_hungarian_pollen_tags_skeleton_merged_C02_170628120000_detections.csv`.
 
 
 ## Demo
