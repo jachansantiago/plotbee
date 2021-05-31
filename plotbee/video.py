@@ -119,9 +119,12 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
     
     for i, frame in enumerate(tqdm(video_data, desc=video_filename)):
         ret, im = video.read()
-        im = preprocess_input(im)
+        if not ret:
+            print("Something wrong with the video.")
         bodies, images = Frame._extract_bodies_images(im, frame)
-        images = images/255.
+        
+        images = [preprocess_input(im) for im in images]
+
         try:
             score=model.predict_on_batch(images)
         except:
@@ -393,7 +396,7 @@ def dist(a, b):
     return np.sqrt(np.sum((npa - npb)**2))
 
 
-def match_tags(frame, tag_list, th_dist=50):
+def match_tags(frame, tag_list, virtual=False, th_dist=50):
     
     for tag in tag_list:
         min_dist = th_dist
@@ -407,7 +410,7 @@ def match_tags(frame, tag_list, th_dist=50):
                 closest_body = body
         if closest_body is not None:
             closest_body.tag = tag
-        else:
+        elif virtual:
             # Add new body with the tag as thorax
             x, y = tag['c']
             body = Body({3: [(x,y)]}, center=3,
@@ -743,7 +746,7 @@ class Video():
             for body in frame:
                 body.tag = None
 
-    def load_tags(self, tags_file):
+    def load_tags(self, tags_file, virtual=False):
         tags = read_json(tags_file)
         self.clear_tags()
 
@@ -752,7 +755,7 @@ class Video():
             if sid in tags["data"]:
                 tagged_bees = tags["data"][sid]['tags']
 
-                match_tags(frame, tagged_bees, th_dist=50)
+                match_tags(frame, tagged_bees, virtual=virtual, th_dist=50)
         return
 
     def load_video(self, video_file):

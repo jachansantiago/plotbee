@@ -3,7 +3,7 @@ import argparse
 import os
 from plotbee.video import Video
 from plotbee.body import Body
-from plotbee.export import video2coco, sleap2pb
+from plotbee.export import video2coco, sleap2pb, video2analysis
 
 # sub-command functions
 def tracking(args):
@@ -126,6 +126,7 @@ def export(args):
     pollen = args.pollen
     tags = args.tags
     coco = args.coco
+    analysis = args.analysis
     images = args.images
     limit = args.size
     width = args.width
@@ -147,6 +148,17 @@ def export(args):
     if coco:
         video2coco(input_filename, output_folder, image_extraction=images,
                      width=width, height=height)
+
+    if analysis:
+        print("Loading video data.")
+        path, filename = os.path.split(input_filename)
+        filename, ext = os.path.splitext(filename)
+        output_filename = os.path.join(path, "analysis_" + filename + ".csv")
+        video = Video.load(input_filename)
+        video.track_clasification()
+        df = video2analysis(video)
+        df.to_csv(output_filename, index=False)
+
 
 
 
@@ -214,15 +226,16 @@ parser_pipeline.set_defaults(func=pipeline)
 # create the parser for the "export" command
 parser_export = subparsers.add_parser('export')
 parser_export.add_argument('-f', '--file', type=str, required=True)
-parser_export.add_argument('-o', '--output_folder', type=str, required=True)
+parser_export.add_argument('-o', '--output_folder', type=str, default=".")
 parser_export.add_argument('-s', '--size', type=int, default=None)
-parser_export.add_argument('--width', type=int, required=True)
-parser_export.add_argument('--height', type=int, required=True)
+parser_export.add_argument('--width', type=int, default=375)
+parser_export.add_argument('--height', type=int, default=450)
 parser_export.add_argument('--images', action='store_true')
 datatype = parser_export.add_mutually_exclusive_group(required=True)
 datatype.add_argument('--pollen', action='store_true')
 datatype.add_argument('--tags', action='store_true')
 datatype.add_argument('--coco', action='store_true')
+datatype.add_argument('--analysis', action='store_true')
 parser_export.set_defaults(func=export)
 
 #parse the args and call whatever function was selected

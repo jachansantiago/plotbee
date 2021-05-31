@@ -6,6 +6,7 @@ import os
 import cv2
 from tqdm import tqdm
 from collections import defaultdict
+import pandas as pd
 
 def get_full_skeleton(video):
     max_part_body = []
@@ -256,5 +257,47 @@ def sleap2pb(sleap_json):
         video.save(out_name)
         
     return
+
+def parse_body_entry(body, track):
+    body_params = body.params()
+    
+    
+    body_dict = dict()
+    
+    body_dict["frame"] = body_params["frameid"]
+    body_dict["track_id"] = body_params["id"]
+    body_dict["pollen_score"] = body_params['pollen_score']
+    body_dict["tag_id"] = body.tag_id
+    
+    x, y = body.center
+    body_dict["x"] = x
+    body_dict["y"] = y
+    
+    
+    if track is not None:
+        track_params = track.__dict__
+    
+        body_dict["track_pollen_score"] = track_params["pollen_score"]
+        body_dict["track_shape"] = track_params['_track_shape']
+        body_dict["track_event"] = track_params['_event']
+        if track_params['_tag'].mode.size > 0:
+            body_dict["track_tag"] = track_params['_tag'].mode[0]
+        else:
+            body_dict["track_tag"] = None
+    
+    return body_dict
+
+def video2analysis(video):
+    entries = list()
+    for frame in tqdm(video):
+        for body in frame:
+            if body.id == -1:
+                track = None
+            else:
+                track = video.tracks[body.id]
+            entry = parse_body_entry(body, track)
+            entries.append(entry)
+            
+    return pd.DataFrame(entries)
     
     
