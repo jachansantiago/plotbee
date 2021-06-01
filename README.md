@@ -35,7 +35,7 @@ Benchmark for one hour video.
 |   Workers     | Time          |  GPU Memory  |
 | :-----------: | :-----------: | :----------: |
 |       4       |    ~50 min    |     10.4GB   |
-|       8       |    ~25 min    |     20.8GB   |
+|       8       |    ~30 min    |     20.8GB   |
 
 ### Tag Detetction
 
