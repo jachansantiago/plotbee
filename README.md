@@ -32,10 +32,11 @@ This command produces an `output_file = data/pollen_merged_C02_170622120000_dete
 
 Benchmark for one hour video.
 
-|   Workers     | Time          |  GPU Memory  |
-| :-----------: | :-----------: | :----------: |
-|       4       |    ~50 min    |     10.4GB   |
-|       8       |    ~30 min    |     20.8GB   |
+|   Workers     | Time          |  GPU Memory  |  Image Size  |
+| :-----------: | :-----------: | :----------: | :----------: |
+|       4       |    ~50 min    |     10.4GB   |    450x375   |
+|       8       |    ~30 min    |     20.8GB   |    450x375   |
+|       8       |    ~7 min     |     20.8GB   |    90x90     |
 
 ### Tag Detetction
 
