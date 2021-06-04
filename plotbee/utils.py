@@ -60,7 +60,8 @@ def hash3(i):
 def id2color(i):
     if i == -1:
         return (0,0,0)
-    return hash1(i), hash2(i), hash3(i)
+    #return hash1(i), hash2(i), hash3(i)
+    return hash1(i)//2+128, hash2(i)//2+128, hash3(i)//2+128
 
 
 def angleBetweenPoints(p1, p2):

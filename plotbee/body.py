@@ -52,7 +52,7 @@ class Body():
         return body
 
 
-    def __init__(self, parts, center, angle_conn, connections, frame, body_id=-1, suppressed=False, pollen_score=0.0, tag=None, features=None):
+    def __init__(self, parts, center, angle_conn, connections, frame, body_id=-1, suppressed=False, pollen_score=0.0, tag=None, features=None, virtual=False):
         self._parts = parts
         self._center_part = center
         self._connections = connections
@@ -65,6 +65,7 @@ class Body():
         self.pollen_score = pollen_score
         self.tag = tag
         self.features = features
+        self.virtual = virtual
  
     @property
     def valid(self):
@@ -207,7 +208,10 @@ class Body():
     def __repr__(self):
         coords = repr(self.parts)
         coords = coords[coords.find('{'):-1]
-        return "Body(id={}, parts={})".format(self.id, coords)
+        if (self.virtual):
+            return "Body(id={}, parts={}, virtual=True)".format(self.id, coords)
+        else:
+            return "Body(id={}, parts={})".format(self.id, coords)
 
 
     def save(self, path, width=None, height=None, cX=None, cY=None, erase_tag=False):

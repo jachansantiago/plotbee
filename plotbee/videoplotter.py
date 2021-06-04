@@ -57,20 +57,31 @@ def events(frame):
     plt.imshow(frame.event_image)
 
 
-def bbox_drawer(frame, body, idtext=False):
+def bbox_drawer(frame, body, idtext=False, idpos='avg', fontScale=1.5, fontThickness=3):
     color = id2color(body.id)
-    text = "id={}".format(body.id)
     font = cv2.FONT_HERSHEY_DUPLEX
-    fontScale = 1.5
+    #fontScale = 1.5
     p1, p2, p3, p4 = body.boundingBox()
         
-    frame = cv2.line(frame, p1, p2, color=color, thickness=7)
-    frame = cv2.line(frame, p2, p3, color=color, thickness=7)
-    frame = cv2.line(frame, p3, p4, color=color, thickness=7)
-    frame = cv2.line(frame, p4, p1, color=color, thickness=7)
+    thick = 3 if body.virtual else 7   # Thin line if virtual
+    frame = cv2.line(frame, p1, p2, color=color, thickness=thick)
+    frame = cv2.line(frame, p2, p3, color=color, thickness=thick)
+    frame = cv2.line(frame, p3, p4, color=color, thickness=thick)
+    frame = cv2.line(frame, p4, p1, color=color, thickness=thick)
 
     if idtext:
-        cv2.putText(frame, text, p1, font, fontScale, color=color, thickness=3)
+        if (idpos=='p1'):
+            text = "id={}".format(body.id)
+            P = p1
+            cv2.putText(frame, text, P, font, fontScale, color=color, thickness=3)
+        else:
+            thick = (fontThickness+1)//2 if body.virtual else fontThickness   # Thin line if virtual
+            text = "{}".format(body.id)
+            P = tuple( [int(x) for x in np.mean( np.array((p1,p2,p3,p4)), axis=0)] )
+            textsize = cv2.getTextSize(text, font, fontScale, thickness=thick)
+            #print(P,textsize[0])
+            pos = (2*P[0] - textsize[0][0]) // 2, (2*P[1] + textsize[0][1]) // 2
+            cv2.putText(frame, text, pos, font, fontScale, color=color, thickness=thick)
 
     return frame
 
