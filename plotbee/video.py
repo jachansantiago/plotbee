@@ -30,7 +30,7 @@ from plotbee.videoplotter import extract_body
 # from plotbee.pollen import process_pollen 
 
 # from plotbee.utils import divide_video, merge_videos
-from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import model_from_json, load_model
 import tensorflow as tf
 import multiprocessing as mp
 
@@ -81,15 +81,28 @@ def merge_videos(video_names):
     
 
 
-def load_model(json_file):
+def load_json_model(json_file):
     with open(json_file, 'r') as f:
         data = json.load(f)
     return model_from_json(data)
 
+def load_pollen_model(model_path):
+    path, ext = os.path.splitext(model_path)
 
-def preprocess_input(image):
+    if ext.lower() == "json":
+        model = load_json_model(model_path)
+    else:
+        model = load_model(model_path, compile=False)
+    return model
+
+
+def preprocess_input(image, rescale_factor=1):
+
+    image_height, image_width, _ = image.shape
+    dim = (image_height//rescale_factor, image_width//rescale_factor)
+
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-#     image = cv2.resize(image, SIZE)
+    image = cv2.resize(image, dim)
     image = cv2.normalize(image,dst=image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     return image
 
@@ -105,8 +118,9 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
     
     folder = '/'.join(video_filename.split('/')[:-1])
     
-    model = load_model(model_path)
-    model.load_weights(weigths_path)
+    model = load_pollen_model(model_path)
+    if weigths_path != None:
+        model.load_weights(weigths_path)
 
     video_data = Video.load(video_filename)
     start = video_data[0].id
@@ -114,8 +128,8 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
     video = video_data.get_video_stream(start=start)
     data = list()
 
-    Body.width=375
-    Body.height=450
+    Body.width=360
+    Body.height=360
     
     for i, frame in enumerate(tqdm(video_data, desc=video_filename)):
         ret, im = video.read()
@@ -123,7 +137,8 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
             print("Something wrong with the video.")
         bodies, images = Frame._extract_bodies_images(im, frame)
         
-        images = [preprocess_input(im) for im in images]
+        images = [preprocess_input(im, rescale_factor=4) for im in images]
+        images = np.array(images)
 
         try:
             score=model.predict_on_batch(images)
@@ -803,9 +818,10 @@ class Video():
         
         return
 
-    def export_pollen(self, output_folder, limit=None):
+    def export_pollen(self, output_folder, limit=None, sorted_scores=False):
         bodies = [body for frame in self for body in frame]
         bodies = sorted(bodies, key=(lambda b: b.pollen_score))
+        
 
         def valid(body):
             x, y = body.center
@@ -815,11 +831,29 @@ class Video():
 
         bodies = [body for body in bodies if valid(body)]
 
-        if limit:
+        if limit and sorted_scores:
             bodies = bodies[:limit//2] + bodies[-limit//2:]
+        elif limit:
+            pollen_scores = [body.pollen_score for body in bodies]
+            threshold_index = bisect.bisect(pollen_scores, 0.5)
+            no_pollen_bodies = bodies[:threshold_index]
+            pollen_bodies = bodies[threshold_index:]
+
+            random.shuffle(no_pollen_bodies)
+            random.shuffle(pollen_bodies)
+
+            bodies = no_pollen_bodies[:limit//2] + pollen_bodies[:limit//2]
+
+
+
+
+
 
         _, video_name = os.path.split(self.video_path)
         video_name, ext = os.path.splitext(video_name)
+
+        print(video_name)
+        
         out_path = os.path.join(output_folder, video_name)
         os.makedirs(out_path, exist_ok=True)
         
@@ -862,8 +896,8 @@ class Video():
         
         return
     
-    def process_pollen(self,  model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048):
-        pollen_video = process_pollen(self, model_path, model_weights, workers=workers, gpus=gpus, model_size=model_size)
+    def process_pollen(self,  model_path, weights=None, workers=4, gpus=["1", "0"], model_size=2048):
+        pollen_video = process_pollen(self, model_path, weights, workers=workers, gpus=gpus, model_size=model_size)
         
         self._frames = pollen_video._frames
         self._tracks = pollen_video._tracks

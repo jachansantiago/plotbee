@@ -29,7 +29,7 @@ def tracking(args):
 def pollen(args):
     input_filename = args.file
     input_video = args.video
-    model_path = args.model_json
+    model_path = args.model
     weights = args.weights
     workers = args.workers
 
@@ -43,7 +43,7 @@ def pollen(args):
         video.load_video(input_video)
 
     print("Pollen Detection.")
-    video.process_pollen(model_path, weights, workers=workers)
+    video.process_pollen(model_path, weights=weights, workers=workers)
 
     print("Saving video on {}.".format(output_filename))
     video.save(output_filename)
@@ -185,8 +185,8 @@ parser_skeleton.set_defaults(func=skeleton)
 parser_pollen = subparsers.add_parser('pollen')
 parser_pollen.add_argument('-f', '--file', type=str, required=True)
 parser_pollen.add_argument('-v', '--video', type=str, default=None)
-parser_pollen.add_argument('--model_json', type=str, required=True)
-parser_pollen.add_argument('--weights', type=str, required=True)
+parser_pollen.add_argument('--model', type=str, required=True)
+parser_pollen.add_argument('--weights', type=str, required=False)
 parser_pollen.add_argument('--workers', type=int, default=4)
 parser_pollen.set_defaults(func=pollen)
 
@@ -216,8 +216,8 @@ parser_pipeline.add_argument('-v', '--video', type=str, default=None)
 parser_pipeline.add_argument('--format', type=str, default="beepose")
 
 parser_pipeline.add_argument('--pollen', action='store_true')
-parser_pipeline.add_argument('--model_json', type=str, required=True)
-parser_pipeline.add_argument('--weights', type=str, required=True)
+parser_pipeline.add_argument('--model', type=str, required=True)
+parser_pipeline.add_argument('--weights', type=str, required=False)
 parser_pipeline.add_argument('--workers', type=int, default=4)
 
 parser_pipeline.add_argument('--tags', action='store_true')
