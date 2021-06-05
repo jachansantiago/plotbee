@@ -57,23 +57,23 @@ def events(frame):
     plt.imshow(frame.event_image)
 
 
-def bbox_drawer(frame, body, idtext=False, idpos='avg', fontScale=1.5, fontThickness=3):
+def bbox_drawer(frame_image, body, idtext=False, idpos='avg', fontScale=1.5, fontThickness=3):
     color = id2color(body.id)
     font = cv2.FONT_HERSHEY_DUPLEX
     #fontScale = 1.5
     p1, p2, p3, p4 = body.boundingBox()
         
     thick = 3 if body.virtual else 7   # Thin line if virtual
-    frame = cv2.line(frame, p1, p2, color=color, thickness=thick)
-    frame = cv2.line(frame, p2, p3, color=color, thickness=thick)
-    frame = cv2.line(frame, p3, p4, color=color, thickness=thick)
-    frame = cv2.line(frame, p4, p1, color=color, thickness=thick)
+    frame = cv2.line(frame_image, p1, p2, color=color, thickness=thick)
+    frame = cv2.line(frame_image, p2, p3, color=color, thickness=thick)
+    frame = cv2.line(frame_image, p3, p4, color=color, thickness=thick)
+    frame = cv2.line(frame_image, p4, p1, color=color, thickness=thick)
 
     if idtext:
         if (idpos=='p1'):
             text = "id={}".format(body.id)
             P = p1
-            cv2.putText(frame, text, P, font, fontScale, color=color, thickness=3)
+            cv2.putText(frame_image, text, P, font, fontScale, color=color, thickness=3)
         else:
             thick = (fontThickness+1)//2 if body.virtual else fontThickness   # Thin line if virtual
             text = "{}".format(body.id)
@@ -81,29 +81,35 @@ def bbox_drawer(frame, body, idtext=False, idpos='avg', fontScale=1.5, fontThick
             textsize = cv2.getTextSize(text, font, fontScale, thickness=thick)
             #print(P,textsize[0])
             pos = (2*P[0] - textsize[0][0]) // 2, (2*P[1] + textsize[0][1]) // 2
-            cv2.putText(frame, text, pos, font, fontScale, color=color, thickness=thick)
+            cv2.putText(frame_image, text, pos, font, fontScale, color=color, thickness=thick)
 
-    return frame
+    return frame_image
+
+def bodies_bbox_drawer(frame_image, bodies, **kwargs):
+    for body in bodies:
+        frame_image = bbox_drawer(frame_image, body, **kwargs)
+    return frame_image
 
 
-def skeleton_drawer(frame, body, idtext=False):
+def skeleton_drawer(frame_image, body, idtext=False):
     color = id2color(body.id)
     for p1, p2 in body.skeleton:
-        frame = cv2.line(frame, p1, p2, color=color, thickness=7)
-    return frame
+        frame_image = cv2.line(frame_image, p1, p2, color=color, thickness=7)
+    return frame_image
+
+def bodies_skeleton_drawer(frame_image, bodies, **kwargs):
+    for body in bodies:
+        frame_image = skeleton_drawer(frame_image, body, **kwargs)
+    return frame_image
 
 
-def parts_drawer(frame, parts_dict):
+def parts_drawer(frame_image, parts_dict):
     for part, points in parts_dict.items():
         color = COLOR_BY_PART[str(part - 1)]
         for point in points:
             p = tuple(point[:2])
-            frame = cv2.circle(frame, p, RADIUS, color, THICKNESS)
-    return frame
-
-
-# def mapping_drawer(frame, mappings):
-
+            frame_image = cv2.circle(frame_image, p, RADIUS, color, THICKNESS)
+    return frame_image
 
 
 def extract_body(frame, body, width=200, height=400, cX=None, cY=None, ignore_angle=False):
@@ -142,6 +148,13 @@ def track_drawer(frame, body, thickness=3, direction="forward"):
 
     return cv2.polylines(frame, [points], False, color, thickness)
 
+def bodies_track_drawer(frame_image, bodies, **kwargs):
+    for body in bodies:
+        frame_image = track_drawer(frame_image, body, **kwargs)
+    return frame_image
+
+
+
 def event_track_drawer(frame, body, track, thickness=3):
     points = list()
     color = trackevent2color(track)
@@ -157,6 +170,12 @@ def event_track_drawer(frame, body, track, thickness=3):
     points = np.array([points], dtype=np.int32)
 
     return cv2.polylines(frame, [points], False, color, thickness)
+
+def bodies_event_track_drawer(frame_image, bodies, **kwargs):
+    for body in bodies:
+        track = body._frame.get_track(body)
+        frame_image = event_track_drawer(frame_image, body, track, **kwargs)
+    return frame_image
 
 
 def track_images(track, figsize=(10, 20)):

@@ -1,5 +1,5 @@
-from plotbee.videoplotter import bbox_drawer, skeleton_drawer, track_drawer
-from plotbee.videoplotter import parts_drawer, event_track_drawer
+from plotbee.videoplotter import bodies_bbox_drawer, bodies_skeleton_drawer, bodies_track_drawer
+from plotbee.videoplotter import parts_drawer, bodies_event_track_drawer
 from plotbee.videoplotter import extract_body
 from plotbee.utils import rotate_bound2
 from plotbee.utils import pointInRotatedBbox
@@ -97,36 +97,28 @@ class Frame():
     def video_name(self):
         return self._video.video_name
 
-    def _image(self, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward", idtext=False, fontScale=1.5, fontThickness=3):
-        frame = self.image.copy()
+    def _image(self, **kwargs):
+        frame_image = self.image.copy()
+        frame_image = self.draw_frame_image(frame_image, **kwargs)
+        return frame_image
+
+    def draw_frame_image(self, frame_image, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward", idtext=False, fontScale=1.5, fontThickness=3):
+        filtered_bodies = [body for body in  self.bodies if len(body) >= min_parts]
 
         if bbox:
-            for body in self.bodies:
-                if len(body) < min_parts:
-                    continue
-                frame = bbox_drawer(frame, body, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness)
+            frame_image = bodies_bbox_drawer(frame_image, filtered_bodies, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness)
 
         if skeleton:
-            for body in self.bodies:
-                if len(body) < min_parts:
-                    continue
-                frame = skeleton_drawer(frame, body)
+            frame_image = bodies_skeleton_drawer(frame_image, filtered_bodies)
 
         if tracks:
-            for body in self.bodies:
-                if len(body) < min_parts:
-                    continue
-                frame = track_drawer(frame, body, direction=track_direction)
+            frame_image = bodies_track_drawer(frame_image, filtered_bodies, direction=track_direction)
 
         if events:
-            for body in self.bodies:
-                if body.id == -1 or len(body) < min_parts:
-                    continue
-                btrack = self.get_track(body)
-                frame = event_track_drawer(frame, body, btrack)
+            tracked_bodies = [body for body in filtered_bodies if body.id != -1]
+            frame_image = bodies_event_track_drawer(frame_image, tracked_bodies)
 
-
-        return frame
+        return frame_image
 
     def bbox_image(self, idtext, suppression=False):
 

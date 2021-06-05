@@ -22,9 +22,10 @@ from plotbee.body import Body
 from plotbee.body import parse_parts
 from plotbee.track import Track
 from plotbee.utils import save_json
-from plotbee.tracking import hungarian_tracking, sort_tracking, non_max_supression_video
+from plotbee.tracking import hungarian_tracking, sort_tracking, non_max_supression_video, hungarian_tracking_with_prediction
 from plotbee.events import track_classification
 from plotbee.tag import detect_tags_on_video
+from plotbee.video_wrapper import VideoCaptureWrapper
 # from plotbee.tag import match_tags
 from plotbee.videoplotter import extract_body
 # from plotbee.pollen import process_pollen 
@@ -339,7 +340,7 @@ def image_from_video(video_path, frameid):
     return im
 
 
-def get_video(video_path, start=0):
+def get_video(video_path, start=0, end=np.inf, step=1):
 
     video = cv2.VideoCapture(video_path)
 
@@ -565,8 +566,8 @@ class Video():
         return self._frames[frame_id]
     
     
-    def get_video_stream(self, start=0):
-        return get_video(self.video_path, start=start)
+    def get_video_stream(self, start=0, end=len(self), step=1):
+        return VideoCaptureWrapper(self.video_path, start=start, end=end, step=step)
 
 
     def __repr__(self):
@@ -631,8 +632,11 @@ class Video():
     def non_max_supression(self, nms_overlap_fraction=0.6):
         non_max_supression_video(self, nms_overlap_fraction)
     
-    def hungarian_tracking(self, cost=200, nms_overlap_fraction=0.6):
-        hungarian_tracking(self, cost, nms_overlap_fraction)
+    def hungarian_tracking(self, predictive=True, **kwargs):
+        if predictive:
+            hungarian_tracking_with_prediction(self, **kwargs)
+        else:
+            hungarian_tracking(self, **kwargs)
 
     def sort_tracking(self, bbox=200, nms_overlap_fraction=0.6):
         sort_tracking(self, bbox, nms_overlap_fraction)
