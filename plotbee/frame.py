@@ -81,6 +81,9 @@ class Frame():
             if not body.suppressed:
                 valid.append(body)
         return valid
+    
+    def delete_virtual_bodies(self):
+        self._bodies = [b for b in self._bodies if (not b.virtual)]
 
     def update(self, bodies):
         self._bodies += bodies
@@ -94,14 +97,14 @@ class Frame():
     def video_name(self):
         return self._video.video_name
 
-    def _image(self, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward"):
+    def _image(self, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward", idtext=False, fontScale=1.5, fontThickness=3):
         frame = self.image.copy()
 
         if bbox:
             for body in self.bodies:
                 if len(body) < min_parts:
                     continue
-                frame = bbox_drawer(frame, body)
+                frame = bbox_drawer(frame, body, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness)
 
         if skeleton:
             for body in self.bodies:
@@ -255,10 +258,11 @@ class Frame():
         return bodies  
 
         
-    def save(self, folder, skeleton=True, bbox=True, tracks=False, events=True, min_parts=-1):
+    def save(self, folder, skeleton=True, bbox=True, tracks=False, events=True, min_parts=-1,
+             idtext=False, fontScale=2.5, fontThickness=8):
         file_format = "{:09d}.jpg"
         os.makedirs(folder, exist_ok=True)
-        im = self._image(skeleton=skeleton, bbox=bbox, tracks=tracks, events=events, min_parts=min_parts)
+        im = self._image(skeleton=skeleton, bbox=bbox, tracks=tracks, events=events, min_parts=min_parts, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness)
         
         fname = file_format.format(self.id)
         im_path = os.path.join(folder, fname)

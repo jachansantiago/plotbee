@@ -262,6 +262,9 @@ def create_bodies_from_mapping(tracking_limb, tracking_part, mapping, tracks, id
 
 
 def frames_from_detections(detections, tracks, id_tracks, tracking_limb=(1, 3), tracking_part=3, video_path=None, load_image=False):
+    """
+    Create Video from Ivan's detections and tracks JSON objects
+    """
     
     frame_list = list()
     prev_track = defaultdict(lambda: None)
@@ -597,7 +600,7 @@ class Video():
             raise TypeError(msg.format(cls))
 
     
-    def export(self, path, skeleton=True, bbox=True, tracks=True, events=False, min_parts=-1, max_workers=5):
+    def export(self, path, skeleton=True, bbox=True, tracks=True, events=False, min_parts=-1, max_workers=5, idtext=False, fontScale=2.5, fontThickness=8):
         
         os.makedirs(path, exist_ok=True)
         # Parallel Implementaion
@@ -605,7 +608,9 @@ class Video():
             future_frames = list()
             for frame in self.frames:
                 future = executor.submit(frame.save, path, skeleton, bbox,
-                                        tracks, events, min_parts)
+                                        tracks, events, min_parts,  
+                                        idtext=idtext, fontScale=fontScale,
+                                        fontThickness=fontThickness)
                 future_frames.append(future)
                 
             

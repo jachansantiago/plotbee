@@ -25,17 +25,18 @@ The pollen sub-command performs pollen detection at the detection level. Model's
 
 ```
 pb pollen --file data/C02_170622120000_skeleton.json --video data/C02_170622120000.mp4 \
---model_json /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.json \
+--model /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.json \
 --weights /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.h5 --workers 4
 ```
 This command produces an `output_file = data/pollen_merged_C02_170622120000_detections.json`.
 
 Benchmark for one hour video.
 
-|   Workers     | Time          |  Memory  |
-| ------------- | ------------- | -------- |
-|       4       |    ~50 min    |    8GB   |
-|       8       |   not yet     |    16GB  |
+|   Workers     | Time          |  GPU Memory  |  Image Size  |
+| :-----------: | :-----------: | :----------: | :----------: |
+|       4       |    ~50 min    |     10.4GB   |    450x375   |
+|       8       |    ~30 min    |     20.8GB   |    450x375   |
+|       8       |    ~7 min     |     20.8GB   |    90x90     |
 
 ### Tag Detetction
 
