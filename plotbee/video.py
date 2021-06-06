@@ -21,7 +21,7 @@ from plotbee.frame import Frame
 from plotbee.body import Body
 from plotbee.body import parse_parts
 from plotbee.track import Track
-from plotbee.utils import save_json
+from plotbee.utils import save_json, rescale_image
 from plotbee.tracking import hungarian_tracking, sort_tracking, non_max_supression_video, hungarian_tracking_with_prediction
 from plotbee.events import track_classification
 from plotbee.tag import detect_tags_on_video
@@ -100,9 +100,9 @@ def load_pollen_model(model_path):
 def preprocess_input(image, rescale_factor=1):
 
     image_height, image_width, _ = image.shape
-    dim = (image_height//rescale_factor, image_width//rescale_factor)
+    dim = (image_width//rescale_factor, image_height//rescale_factor)
 
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     image = cv2.resize(image, dim)
     image = cv2.normalize(image,dst=image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     return image
@@ -124,9 +124,9 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
         model.load_weights(weigths_path)
 
     video_data = Video.load(video_filename)
-    start = video_data[0].id
+    # start = video_data[0].id
 #     print(start)
-    video = video_data.get_video_stream(start=start)
+    video = video_data.get_video_stream()
     data = list()
 
     Body.width=360
@@ -479,6 +479,17 @@ class Video():
 
         config = data["config"]
 
+        start = 0
+        stop = None
+        step = 1
+        # to support old versions
+        if "start" in data:
+            start = data["start"]
+        if "stop" in data:
+            stop = data["stop"]
+        if "step" in data:
+            step = data["step"]
+
         frames = list()
         track_dict = dict()
         prev_track = defaultdict(lambda: None)
@@ -517,7 +528,7 @@ class Video():
         # for i, tr in track_dict.items():
         #     tr.init()
 
-        return cls(frames, track_dict, config)
+        return cls(frames, track_dict, config, start=start, stop=stop, step=step)
 
     @classmethod
     def from_detections(cls, detections, video_path=None, load_images=False):
@@ -527,9 +538,14 @@ class Video():
 
                  
     
-    def __init__(self, frames, tracks, config):
+    def __init__(self, frames, tracks, config, start=0, stop=None, step=1):
         self._frames = frames
         self._tracks = tracks
+        self._start = start
+        self._stop = stop
+        if not stop: 
+            self._stop = len(self._frames)
+        self._step = step
 
         for frame in self._frames:
             frame.set_video(self)
@@ -566,8 +582,18 @@ class Video():
         return self._frames[frame_id]
     
     
-    def get_video_stream(self, start=0, end=len(self), step=1):
-        return VideoCaptureWrapper(self.video_path, start=start, end=end, step=step)
+    def get_video_stream(self, start=None, stop=None, step=None):
+
+        if step is None:
+            step = self._step
+
+        if start is None:
+            start =  self._start
+
+        if stop is None:
+            stop = self._stop
+
+        return VideoCaptureWrapper(self.video_path, start=start, stop=stop, step=step)
 
 
     def __repr__(self):
@@ -593,7 +619,17 @@ class Video():
     def __getitem__(self, index):
         cls = type(self)
         if isinstance(index, slice):
-            return cls(self._get_frame(index), self._tracks, self.config)
+            start = index.start
+            stop = index.stop
+            step = index.step
+            if index.step is None:
+                step = self._step
+            if index.start is None:
+                start = self._start
+            if index.stop is None:
+                stop = self._stop
+            
+            return cls(self._get_frame(index), self._tracks, self.config, start=start, stop=stop, step=step)
         elif isinstance(index, numbers.Integral):
             return self._get_frame(index)
         else:
@@ -742,6 +778,10 @@ class Video():
     def json(self):
         video_json = dict()
         video_json["config"] = self._config
+        video_json["start"] = self._start
+        video_json["stop"] = self._stop
+        video_json["step"] = self._step
+
         video_json["frames"] = list()
 
         for frame in tqdm(self._frames):

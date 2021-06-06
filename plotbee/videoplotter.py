@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import os
-from plotbee.utils import id2color, rotate_bound2, trackevent2color
+from plotbee.utils import id2color, rotate_bound2, trackevent2color, rescale_image
+from matplotlib.animation import FuncAnimation
+from IPython.display import HTML
+from tqdm import tqdm
 
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
@@ -297,3 +300,82 @@ def contact_sheet(bee_list, save_path=None, cols=10, tag=False):
         plt.savefig(path, bbox_inches='tight')
 
     
+
+    
+class VideoAnimation():
+    
+    def __init__(self, video, skeleton=True, tracks=True, rescale_factor=4):
+        
+        self.video = video
+        
+        self.skeleton = skeleton
+        self.tracks = tracks
+        
+        self.rescale_factor = rescale_factor
+        
+        self.pbar = tqdm(total=len(video))
+        
+        self.fig = plt.figure()
+        self.ax = plt.axes()
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        frame_image = self.video[0]._image(skeleton=self.skeleton, tracks=self.skeleton)
+        if self.rescale_factor > 1:
+            frame_image = rescale_image(frame_image, self.rescale_factor)
+        self.image = self.ax.imshow(frame_image, interpolation="nearest")
+        self.fig.tight_layout()
+        
+    def get_init(self):
+        
+        def init():
+            frame_id = self.video[0].id
+            self.ax.set_title("Frame :{}".format(frame_id))
+            return [self.image]
+        
+        return init
+    
+    def get_animate(self, video_stream, pbar):
+        def animate(i):
+            fid, frame_image = video_stream.read()
+            frame_id = self.video[i].id
+            frame_image = self.video[i].draw_frame_image(frame_image, skeleton=self.skeleton, tracks=self.skeleton)
+            if self.rescale_factor > 1:
+                frame_image = rescale_image(frame_image, self.rescale_factor)
+            self.image.set_array(frame_image)
+            self.ax.set_title("Frame: {}".format(frame_id))
+            pbar.update(1)
+            return [self.image]
+        return animate
+    
+    def show(self):
+        
+        video_stream = self.video.get_video_stream()
+        pbar = tqdm(total=len(self.video))
+        
+        animate_func = self.get_animate(video_stream, pbar)
+        
+        
+        anim = FuncAnimation(self.fig, animate_func, init_func=self.get_init(),
+                               frames=len(self.video), interval=50, blit=True)
+        
+        out = HTML(anim.to_html5_video())
+            
+        video_stream.release()
+        pbar.close()
+        return out
+        
+    def save(self, filename, fps=20):
+        video_stream = self.video.get_video_stream()
+        pbar = tqdm(total=len(self.video))
+        
+        animate_func = self.get_animate(video_stream, pbar)
+        
+        
+        anim = FuncAnimation(self.fig, animate_func, init_func=self.get_init(),
+                               frames=len(self.video), interval=50, blit=True)
+        
+        anim.save(filename, fps=fps)
+            
+        video_stream.release()
+        pbar.close()
+        return

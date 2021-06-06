@@ -234,6 +234,14 @@ def trackevent2color(track):
         return RED
     else:
         return None
+
+def rescale_image(image, rescale_factor=4):
+    image_height, image_width, _ = image.shape
+    
+    dim = (image_width//rescale_factor, image_height//rescale_factor)
+    
+    image = cv2.resize(image, dim)
+    return image
     
     
 # def divide_video(video, fname, N):
