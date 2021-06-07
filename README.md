@@ -26,7 +26,7 @@ The pollen sub-command performs pollen detection at the detection level. Model's
 ```
 pb pollen --file data/C02_170622120000_skeleton.json --video data/C02_170622120000.mp4 \
 --model /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.json \
---weights /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.h5 --workers 4
+--weights /home/irodriguez/JANELIA/src/BeeLab/2l_model_2020_angle_auto_compensated1.h5 --workers 8
 ```
 This command produces an `output_file = data/pollen_merged_C02_170622120000_detections.json`.
 
