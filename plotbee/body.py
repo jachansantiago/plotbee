@@ -43,16 +43,29 @@ class Body():
             body_dict["features"] = np.array(None)
         else:
             body_dict["features"] = np.array(body_dict["features"])
+
+        if "metadata" not in body_dict:
+            body_dict["metadata"] = dict()
+
+        if "annotations" not in body_dict:
+            body_dict["annotations"] = dict()
+
+        if "virtual" not in body_dict:
+            body_dict["virtual"] = False
+
         parsed_parts = parse_parts(body_dict["parts"]) 
 
         body = Body(parsed_parts, body_dict["center_part"],
                     tuple(body_dict["angle_conn"]), body_dict["connections"],
                     frameobj, body_dict["id"], body_dict["suppressed"],
-                    body_dict["pollen_score"], body_dict["tag"], body_dict["features"])
+                    body_dict["pollen_score"], body_dict["tag"], body_dict["features"],
+                    body_dict["virtual"],
+                    body_dict["annotations"], body_dict["metadata"])
         return body
 
 
-    def __init__(self, parts, center, angle_conn, connections, frame, body_id=-1, suppressed=False, pollen_score=0.0, tag=None, features=None, virtual=False):
+    def __init__(self, parts, center, angle_conn, connections, frame, body_id=-1, suppressed=False,
+                pollen_score=0.0, tag=None, features=None, virtual=False, annotations=dict(), metadata=dict()):
         self._parts = parts
         self._center_part = center
         self._connections = connections
@@ -66,7 +79,23 @@ class Body():
         self.tag = tag
         self.features = features
         self.virtual = virtual
- 
+        self._annotations = annotations
+        self._metadata = metadata
+
+    def annotate(self, key, value):
+        self._annotations[key] = value
+
+    def set_metadata(self, key, value):
+        self._metadata[key] = value
+
+    @property
+    def annotations(self):
+        return self._annotations
+
+    @property
+    def metadata(self):
+        return self._metadata
+    
     @property
     def valid(self):
         return self.valid_function()
@@ -267,5 +296,8 @@ class Body():
         body_dict["pollen_score"] = self.pollen_score
         body_dict["tag"] = self.tag
         body_dict["features"] = np.array(self.features).tolist()
+        body_dict["virtual"] = self.virtual
+        body_dict["metadata"] = self._metadata
+        body_dict["annotations"] = self._annotations
 
         return body_dict
