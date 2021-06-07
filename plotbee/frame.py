@@ -1,6 +1,6 @@
 from plotbee.videoplotter import bodies_bbox_drawer, bodies_skeleton_drawer, bodies_track_drawer
-from plotbee.videoplotter import parts_drawer, bodies_event_track_drawer
-from plotbee.videoplotter import extract_body
+from plotbee.videoplotter import parts_drawer, bodies_event_track_drawer, bbox_drawer
+from plotbee.videoplotter import extract_body, skeleton_drawer, event_track_drawer, track_drawer
 from plotbee.utils import rotate_bound2
 from plotbee.utils import pointInRotatedBbox
 import os

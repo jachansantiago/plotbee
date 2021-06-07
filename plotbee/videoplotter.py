@@ -313,9 +313,8 @@ class VideoAnimation():
         
         self.rescale_factor = rescale_factor
         
-        self.pbar = tqdm(total=len(video))
         
-        self.fig = plt.figure()
+        self.fig = plt.figure(figsize=(20, 12))
         self.ax = plt.axes()
         self.ax.set_xticks([])
         self.ax.set_yticks([])
@@ -324,7 +323,8 @@ class VideoAnimation():
             frame_image = rescale_image(frame_image, self.rescale_factor)
         self.image = self.ax.imshow(frame_image, interpolation="nearest")
         self.fig.tight_layout()
-        
+        plt.close()
+    
     def get_init(self):
         
         def init():
@@ -350,7 +350,7 @@ class VideoAnimation():
     def show(self):
         
         video_stream = self.video.get_video_stream()
-        pbar = tqdm(total=len(self.video))
+        pbar = tqdm(total=len(self.video), position=0, leave=True)
         
         animate_func = self.get_animate(video_stream, pbar)
         
@@ -366,7 +366,7 @@ class VideoAnimation():
         
     def save(self, filename, fps=20):
         video_stream = self.video.get_video_stream()
-        pbar = tqdm(total=len(self.video))
+        pbar = tqdm(total=len(self.video), position=0, leave=True)
         
         animate_func = self.get_animate(video_stream, pbar)
         

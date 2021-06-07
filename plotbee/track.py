@@ -21,6 +21,12 @@ class Track():
     def tag(self):
         return self._tag
 
+    @property
+    def pollen(self):
+        if self.pollen_score > 0.5:
+            return True
+        return False
+
 #  Now baked in the Track fields
 #     @property
 #     def id(self):
