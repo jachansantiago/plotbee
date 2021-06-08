@@ -98,9 +98,9 @@ This command produces an `output_file = analysis_hungarian_pollen_tags_skeleton_
 
 ## Demo
 
-Try the [demo notebook](https://github.com/jachansantiago/plotbee/blob/master/notebooks/video_example.ipynb).
+Try our [demo notebook](https://colab.research.google.com/drive/1lcppKrnbxGmJelXcuitNfclOW8_JdvEe?usp=sharing).
 
-[Body Annotator Colab](https://colab.research.google.com/drive/1hOMPSU5XCVi8Sja-gF9CBwomgmmeysbE?usp=sharing) for body annotations.
+For bees annotations try [Body Annotator Colab](https://colab.research.google.com/drive/1hOMPSU5XCVi8Sja-gF9CBwomgmmeysbE?usp=sharing).
 
 ### Sample data
 To download sample data run the following command.
