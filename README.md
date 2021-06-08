@@ -1,5 +1,5 @@
 # plotbee
-Plotbee is a library to process, manage and visualize [Beepose](https://github.com/jachansantiago/beepose) detections. [
+Plotbee is a library to process, manage and visualize [Beepose](https://github.com/jachansantiago/beepose) detections.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1lcppKrnbxGmJelXcuitNfclOW8_JdvEe?usp=sharing)
 
