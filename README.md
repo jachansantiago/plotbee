@@ -1,12 +1,14 @@
 # plotbee
-Plotbee is library for plotting Beepose detections
+Plotbee is a library to process, manage and visualize [Beepose](https://github.com/jachansantiago/beepose) detections. [
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1lcppKrnbxGmJelXcuitNfclOW8_JdvEe?usp=sharing)
 
 ## Installation
 
 ```
 git clone --recurse-submodules https://github.com/jachansantiago/plotbee.git
 cd plotbee
-pip install -r requirement.txt
+pip install -r requirements.txt
 python setup.py install
 ```
 
