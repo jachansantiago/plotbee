@@ -304,12 +304,21 @@ def contact_sheet(bee_list, save_path=None, cols=10, tag=False):
     
 class VideoAnimation():
     
-    def __init__(self, video, skeleton=True, tracks=True, rescale_factor=4):
+    def __init__(self, video, skeleton=False, bbox=True, tracks=False, events=False, min_parts=-1, track_direction="forward", idtext=False, fontScale=2.5, fontThickness=8, rescale_factor=4):
         
         self.video = video
         
-        self.skeleton = skeleton
-        self.tracks = tracks
+        self.plot_params = {
+            "skeleton":skeleton,
+            "bbox":bbox,
+            "tracks":tracks,
+            "events":events,
+            "min_parts":min_parts,
+            "idtext":idtext,
+            "fontScale":fontScale,
+            "fontThickness":fontThickness,
+            "track_direction":track_direction
+        }
         
         self.rescale_factor = rescale_factor
         
@@ -318,7 +327,7 @@ class VideoAnimation():
         self.ax = plt.axes()
         self.ax.set_xticks([])
         self.ax.set_yticks([])
-        frame_image = self.video[0]._image(skeleton=self.skeleton, tracks=self.skeleton)
+        frame_image = self.video[0]._image(**self.plot_params)
         if self.rescale_factor > 1:
             frame_image = rescale_image(frame_image, self.rescale_factor)
         self.image = self.ax.imshow(frame_image, interpolation="nearest")
@@ -338,7 +347,7 @@ class VideoAnimation():
         def animate(i):
             fid, frame_image = video_stream.read()
             frame_id = self.video[i].id
-            frame_image = self.video[i].draw_frame_image(frame_image, skeleton=self.skeleton, tracks=self.skeleton)
+            frame_image = self.video[i].draw_frame_image(frame_image, **self.plot_params)
             if self.rescale_factor > 1:
                 frame_image = rescale_image(frame_image, self.rescale_factor)
             self.image.set_array(frame_image)
