@@ -102,7 +102,7 @@ This command produces an `output_file = analysis_hungarian_pollen_tags_skeleton_
 
 Try our [demo notebook](https://colab.research.google.com/drive/1lcppKrnbxGmJelXcuitNfclOW8_JdvEe?usp=sharing).
 
-For bees annotations try [Body Annotator Colab](https://colab.research.google.com/drive/1hOMPSU5XCVi8Sja-gF9CBwomgmmeysbE?usp=sharing).
+For bees annotations try our [body annotator notebook](https://colab.research.google.com/drive/1hOMPSU5XCVi8Sja-gF9CBwomgmmeysbE?usp=sharing).
 
 ### Sample data
 To download sample data run the following command.
