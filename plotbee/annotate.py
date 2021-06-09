@@ -11,6 +11,8 @@ import cv2
 from PIL import Image
 from collections import defaultdict
 import functools
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 import random
 
 from IPython.display import clear_output, display
@@ -76,8 +78,20 @@ def body_info_str(body):
     return str(body.info())
 
 def show_body(body):
-    image = body._image()
+    image = load_image(body)
     display(Image.fromarray(image))
+
+@lru_cache(maxsize=128)
+def load_image(body):
+    return body._image()
+
+def preload_bodies(bodies):
+    """
+    preload images in the lru_cache
+    """
+    for body in bodies:
+        load_image(body)
+
 
 class MultiLabelButton(object):
     def __init__(self, description, task_name):
@@ -117,6 +131,14 @@ class BodyAnnotator():
     def current_body(self):
         return self.bodies[self.current_index]
 
+    def next_body_batch(self, batch_size=20):
+        i = self.current_index
+        return self.bodies[i:i+batch_size]
+
+    def prev_body_batch(self, batch_size=20):
+        i = self.current_index
+        return self.bodies[i-batch_size:i]
+
     @property
     def current_annotation(self):
         return self.current_body.annotations
@@ -132,6 +154,9 @@ class BodyAnnotator():
         
         sort_func = functools.partial(isBodyCompletedAnnotated, self.options)
         self.bodies = sorted(self.bodies, key=lambda x: not sort_func(x))
+
+        self.preload_bodies(command="next")
+        self.preload_bodies(command="prev")
         
         self.label_options, self.label_captions = self.split_options(self.options)
         
@@ -280,6 +305,7 @@ class BodyAnnotator():
             return
         self.current_index += 1
         self.show()
+        self.preload_bodies(command="next")
 
     def go_back(self):
         if self.current_index - 1 < 0:
@@ -287,6 +313,7 @@ class BodyAnnotator():
             return
         self.current_index -= 1
         self.show(default=False)
+        self.preload_bodies(command="prev")
 
     #Sets the values of the annotation to the ones defined as the default ones
     #And then colors the buttons that have those values
@@ -372,3 +399,14 @@ class BodyAnnotator():
     def clear_task_button(self, task_name):
         for button in self.options_buttons[task_name].values():
             button.style.button_color = None
+
+    def preload_bodies(self, command="next"):
+        """
+        preload images in the lru_cache
+        """
+        if command == "next":
+            bodies = self.next_body_batch()
+        elif command == "prev":
+            bodies = self.prev_body_batch()
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(preload_bodies, bodies)

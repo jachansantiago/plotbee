@@ -241,7 +241,7 @@ def cost_matrix_tracks_vectorized(ground_t,detections,threshold):
     
     
 def hungarian_tracking_with_prediction(video, max_dist=100, part='2', nms_min_dist=50, 
-                                       max_step=1, min_track_length=1,
+                                       max_step=4, min_track_length=1,
                                        decay_alpha=0.5, 
                                        debug=False, progress=True):
     """

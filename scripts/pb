@@ -160,11 +160,14 @@ def export(args):
         print("Loading video data.")
         path, filename = os.path.split(input_filename)
         filename, ext = os.path.splitext(filename)
-        output_filename = os.path.join(path, "analysis_" + filename + ".csv")
+        bodies_output_filename = os.path.join(path, "analysis_bodies_" + filename + ".csv")
+        tracks_output_filename = os.path.join(path, "analysis_tracks_" + filename + ".csv")
         video = Video.load(input_filename)
         video.track_clasification()
-        df = video2analysis(video)
-        df.to_csv(output_filename, index=False)
+        bodies_csv, tracks_csv = video2analysis(video)
+
+        bodies_csv.to_csv(bodies_output_filename, index=False)
+        tracks_csv.to_csv(tracks_output_filename, index=False)
 
 
 

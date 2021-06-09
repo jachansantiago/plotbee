@@ -258,7 +258,7 @@ def sleap2pb(sleap_json):
         
     return
 
-def parse_body_entry(body, track):
+def parse_body_entry(body):
     body_params = body.params()
     
     
@@ -272,32 +272,46 @@ def parse_body_entry(body, track):
     x, y = body.center
     body_dict["x"] = x
     body_dict["y"] = y
-    
-    
-    if track is not None:
-        track_params = track.__dict__
-    
-        body_dict["track_pollen_score"] = track_params["pollen_score"]
-        body_dict["track_shape"] = track_params['_track_shape']
-        body_dict["track_event"] = track_params['_event']
-        if track_params['_tag'].mode.size > 0:
-            body_dict["track_tag"] = track_params['_tag'].mode[0]
-        else:
-            body_dict["track_tag"] = None
-    
+
     return body_dict
 
-def video2analysis(video):
+def parse_track_entry(track):
+    track_dict = dict()
+
+    track_params = track.__dict__
+
+    track_dict["track_pollen_score"] = track_params["pollen_score"]
+    track_dict["track_shape"] = track_params['_track_shape']
+    track_dict["track_event"] = track_params['_event']
+    if track_params['_tag'].mode.size > 0:
+        track_dict["track_tag"] = track_params['_tag'].mode[0]
+    else:
+        track_dict["track_tag"] = None
+    return track_dict
+
+
+def bodies2csv(video):
     entries = list()
     for frame in tqdm(video):
         for body in frame:
-            if body.id == -1:
-                track = None
-            else:
-                track = video.tracks[body.id]
-            entry = parse_body_entry(body, track)
+            entry = parse_body_entry(body)
             entries.append(entry)
             
     return pd.DataFrame(entries)
+
+def tracks2csv(video):
+    entries = list()
+    for track_id, track in tqdm(video.tracks.items()):
+        entry = parse_track_entry(track)
+        entries.append(entry)
+            
+    return pd.DataFrame(entries)
+
+def video2analysis(video):
+    
+    bodies_csv = bodies2csv(video)
+    tracks_csv = tracks2csv(video)
+            
+    return bodies_csv, tracks_csv
     
     

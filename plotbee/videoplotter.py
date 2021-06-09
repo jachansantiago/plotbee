@@ -330,7 +330,9 @@ class VideoAnimation():
         frame_image = self.video[0]._image(**self.plot_params)
         if self.rescale_factor > 1:
             frame_image = rescale_image(frame_image, self.rescale_factor)
-        self.image = self.ax.imshow(frame_image, interpolation="nearest")
+
+        self.empty_frame = np.zeros(frame_image.shape)
+        self.image = self.ax.imshow(self.empty_frame, interpolation="nearest")
         self.fig.tight_layout()
         plt.close()
     
@@ -347,9 +349,13 @@ class VideoAnimation():
         def animate(i):
             fid, frame_image = video_stream.read()
             frame_id = self.video[i].id
-            frame_image = self.video[i].draw_frame_image(frame_image, **self.plot_params)
-            if self.rescale_factor > 1:
-                frame_image = rescale_image(frame_image, self.rescale_factor)
+            if fid:
+                frame_image = self.video[i].draw_frame_image(frame_image, **self.plot_params)
+                if self.rescale_factor > 1:
+                    frame_image = rescale_image(frame_image, self.rescale_factor)
+            else:
+                frame_image = self.empty_frame
+                
             self.image.set_array(frame_image)
             self.ax.set_title("Frame: {}".format(frame_id))
             pbar.update(1)
