@@ -519,6 +519,10 @@ class Video():
 
                 if prev_track[b.id] is not None:
                     prev_track[b.id].next = b
+                    track_dict[b.id].endframe = b.frameid
+                    track_dict[b.id]._data[b.frameid] = b
+
+
                 
                 prev_track[b.id] = b
 
@@ -528,7 +532,9 @@ class Video():
         # for i, tr in track_dict.items():
         #     tr.init()
 
-        return cls(frames, track_dict, config, start=start, stop=stop, step=step)
+        video = cls(frames, track_dict, config, start=start, stop=stop, step=step)
+        video.track_clasification()
+        return video
 
     @classmethod
     def from_detections(cls, detections, video_path=None, load_images=False):
