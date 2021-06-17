@@ -99,23 +99,27 @@ def skeleton(args):
 
 
 def pipeline(args):
+    input_filename = args.file
     if args.skeleton:
         skeleton(args)
         path, filename = os.path.split(input_filename)
         output_filename = os.path.join(path, "skeleton_" + filename)
         args.file = output_filename
+        input_filename = output_filename
 
     if args.tags:
         tags(args)
         path, filename = os.path.split(input_filename)
         output_filename = os.path.join(path, "tags_" + filename)
         args.file = output_filename
+        input_filename = output_filename
     
     if args.pollen:
         pollen(args)
         path, filename = os.path.split(input_filename)
         output_filename = os.path.join(path, "pollen_" + filename)
         args.file = output_filename
+        input_filename = output_filename
 
     if args.tracking:
         tracking(args)

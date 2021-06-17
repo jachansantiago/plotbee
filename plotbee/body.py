@@ -257,7 +257,9 @@ class Body():
             "angle": self.angle,
             "x": x,
             "y": y,
-            "parts_num": len(self)
+            "parts_num": len(self),
+            "tag_id": self.tag_id,
+            "virtual":self.virtual
         }
         
         return info
