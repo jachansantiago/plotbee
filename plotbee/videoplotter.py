@@ -223,7 +223,7 @@ def tag_images(video, save_folder=None, black_listed_ids=[15, 16, 13]):
         path = os.path.join(save_folder, video_name + ".pdf")
         plt.savefig(path)
 
-def contact_sheet(bee_list, save_path=None, cols=10, tag=False):
+def tagged_contact_sheet(bee_list, save_path=None, cols=10, bodies=True):
 
     tag_image_folder = "/home/jchan/tags_dataset/tag25h5inv/png/"
     num_images = len(bee_list)
@@ -231,7 +231,7 @@ def contact_sheet(bee_list, save_path=None, cols=10, tag=False):
     figure_height = int(2.5 * rows) + 1
 
 
-    if tag:
+    if bodies:
         rows *= 2
         figure_height *= 2.0
         fig, ax = plt.subplots(nrows=rows, ncols=cols + 1, figsize=(15, figure_height))
@@ -298,6 +298,40 @@ def contact_sheet(bee_list, save_path=None, cols=10, tag=False):
     if save_path is not None:
         path = os.path.join(save_path)
         plt.savefig(path, bbox_inches='tight')
+
+def contact_sheet(bee_list, save_path=None, cols=10):
+
+    num_images = len(bee_list)
+    rows = (num_images // cols)
+    if num_images % cols:
+        rows += 1
+    figure_height = int(2.5 * rows) + 1
+
+    fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(15, figure_height))
+
+    axes = ax.ravel()
+    [ax.set_xticks([]) for ax in axes]
+    [ax.set_yticks([]) for ax in axes]
+
+    for i, ax in enumerate(axes):
+        
+        if i == len(bee_list):
+            break
+        body = bee_list[i]
+
+        ax.imshow(body.image)
+        ax.set_xlabel(str(body.frameid))
+        ax.set_title("Pollen: {0:.2f}".format(body.pollen_score))
+
+    plt.subplots_adjust(hspace=0.4)
+        
+
+    if save_path is not None:
+        path = os.path.join(save_path)
+        plt.savefig(path, bbox_inches='tight')
+
+
+
 
     
 

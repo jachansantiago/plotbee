@@ -252,15 +252,29 @@ class Body():
         x, y = self.center
         
         info = {
-            "id": self.id,
+            "track_id": self.id,
             "frame": self.frameid,
             "angle": self.angle,
             "x": x,
             "y": y,
             "parts_num": len(self),
             "tag_id": self.tag_id,
-            "virtual":self.virtual
+            "virtual":self.virtual,
+            "pollen_score": self.pollen_score
         }
+
+        if self.tag_id is None:
+            info["tagx"] = None
+            info["tagy"] = None
+            info["taghamming"] = None
+            info["tagdm"] = None
+        else:
+            tagx, tagy = self.tag["c"]
+            info["tagx"] = tagx
+            info["tagy"] = tagy
+            info["taghamming"] = self.tag["hamming"]
+            info["tagdm"] = self.tag["dm"]
+
         
         return info
 

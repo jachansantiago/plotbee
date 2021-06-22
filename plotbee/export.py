@@ -280,13 +280,38 @@ def parse_track_entry(track):
 
     track_params = track.__dict__
 
+    track_dict["track_id"] = track_params["id"]
     track_dict["track_pollen_score"] = track_params["pollen_score"]
     track_dict["track_shape"] = track_params['_track_shape']
     track_dict["track_event"] = track_params['_event']
     if track_params['_tag'].mode.size > 0:
-        track_dict["track_tag"] = track_params['_tag'].mode[0]
+        track_dict["track_tagid"] = track_params['_tag'].mode[0]
+        track_dict["track_hastag"] = True
     else:
-        track_dict["track_tag"] = None
+        track_dict["track_tagid"] = None
+        track_dict["track_hastag"] = False
+
+    start_x, start_y = track.start.center
+    start_a = track.start.angle
+    start_frame = track.start.frameid
+    track_dict["track_startframe"] = start_frame 
+    track_dict["track_startx"] = start_x
+    track_dict["track_starty"] = start_y
+    track_dict["track_starta"] = start_a
+
+    end_x, end_y = track.end.center
+    end_a = track.end.angle
+    end_frame = track.end.frameid
+
+    track_dict["track_endframe"] = end_frame 
+    track_dict["track_endx"] = end_x
+    track_dict["track_endy"] = end_y
+    track_dict["track_enda"] = end_a
+
+    track_dict["track_length"] = len(track)
+
+
+
     return track_dict
 
 
@@ -294,8 +319,7 @@ def bodies2csv(video):
     entries = list()
     for frame in tqdm(video):
         for body in frame:
-            entry = parse_body_entry(body)
-            entries.append(entry)
+            entries.append(body.info())
             
     return pd.DataFrame(entries)
 
