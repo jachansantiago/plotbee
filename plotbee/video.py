@@ -539,8 +539,8 @@ class Video():
     @classmethod
     def from_detections(cls, detections, video_path=None, load_images=False):
         frames, tracks = frames_from_detections(detections, None, None,
-                                                video_path=video_path, load_image=load_image)
-        return cls(frame, tracks, dict())
+                                                video_path=video_path, load_image=load_images)
+        return cls(frames, tracks, dict())
 
                  
     
@@ -683,8 +683,8 @@ class Video():
     def sort_tracking(self, bbox=200, nms_overlap_fraction=0.6):
         sort_tracking(self, bbox, nms_overlap_fraction)
         
-    def track_clasification(self, inside=200, outside=1050, threshold=5):
-        track_classification(self, inside, outside, threshold)
+    def track_clasification(self, **kwargs):
+        track_classification(self, **kwargs)
 
     def tag_detection(self, max_workers=5):
         detect_tags_on_video(self, max_workers=max_workers)

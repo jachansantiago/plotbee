@@ -1,7 +1,7 @@
 
 from scipy import stats
 
-def track_classification(video, inside=200, outside=1200, threshold=5, pollen_score="average", tag="mode"):
+def track_classification(video, inside=300, outside=1000, threshold=5, pollen_score="average", tag="mode"):
 
     for track in video.tracks.values():
         _, start = track.start.center
@@ -11,7 +11,7 @@ def track_classification(video, inside=200, outside=1200, threshold=5, pollen_sc
             if start < inside and end < inside :
                 for body in track:
                     x, y = body.center
-                    if y > inside + 100:
+                    if y > inside:
                         track.event = 'walking'
                         track.track_shape = 'inside_inside'
                         break
@@ -21,7 +21,7 @@ def track_classification(video, inside=200, outside=1200, threshold=5, pollen_sc
             elif start > outside and end > outside:
                 for body in track:
                     x, y = body.center
-                    if y < outside - 200:
+                    if y < outside:
                         track.event = 'entering_leaving'
                         track.track_shape = 'outside_outside'
                         break

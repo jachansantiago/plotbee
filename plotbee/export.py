@@ -1,12 +1,37 @@
 from plotbee.video import Video
 from plotbee.body import Body
-from plotbee.utils import save_json
+from plotbee.frame import Frame
+from plotbee.utils import save_json, rescale_image, read_json
 from skimage import io
 import os
 import cv2
 from tqdm import tqdm
 from collections import defaultdict
 import pandas as pd
+import base64
+import plotbee.videoplotter as vplt
+
+def decode_image(im):
+    retval, buffer = cv2.imencode('.jpg', im)
+    image_str = base64.b64encode(buffer)
+    image_str = image_str.decode()
+    return image_str
+
+def get_track_frame(track, body):
+    start_frame = body._frame
+    im = vplt.bbox_drawer(start_frame.image, body, idtext=True)
+    im = vplt.track_drawer(im, body)
+    im = rescale_image(im, rescale_factor=4)
+    im = decode_image(im)
+    return im
+
+def get_images(track):
+    midpoint = (track.startframe + track.endframe) // 2
+    midpoint_body = track[midpoint]
+    start_frame = get_track_frame(track, track.start)
+    mid_frame = get_track_frame(track, track.start)
+    end_frame = get_track_frame(track, midpoint_body)
+    return start_frame, mid_frame, end_frame
 
 def get_full_skeleton(video):
     max_part_body = []
@@ -276,6 +301,8 @@ def parse_body_entry(body):
     return body_dict
 
 def parse_track_entry(track):
+    
+
     track_dict = dict()
 
     track_params = track.__dict__
@@ -287,9 +314,16 @@ def parse_track_entry(track):
     if track_params['_tag'].mode.size > 0:
         track_dict["track_tagid"] = track_params['_tag'].mode[0]
         track_dict["track_hastag"] = True
+        # sf, mf, ef = get_images(track)
+        # track_dict["track_start_image"] = sf
+        # track_dict["track_mid_image"] = mf
+        # track_dict["track_end_image"] = ef
     else:
         track_dict["track_tagid"] = None
         track_dict["track_hastag"] = False
+        # track_dict["track_start_image"] = None
+        # track_dict["track_mid_image"] = None
+        # track_dict["track_end_image"] = None
 
     start_x, start_y = track.start.center
     start_a = track.start.angle
@@ -299,6 +333,8 @@ def parse_track_entry(track):
     track_dict["track_starty"] = start_y
     track_dict["track_starta"] = start_a
 
+    
+    
     end_x, end_y = track.end.center
     end_a = track.end.angle
     end_frame = track.end.frameid
@@ -307,6 +343,7 @@ def parse_track_entry(track):
     track_dict["track_endx"] = end_x
     track_dict["track_endy"] = end_y
     track_dict["track_enda"] = end_a
+    
 
     track_dict["track_length"] = len(track)
 
