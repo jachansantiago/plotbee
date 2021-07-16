@@ -1,7 +1,7 @@
 
 from scipy import stats
 
-def track_classification(video, inside=300, outside=1000, threshold=5, pollen_score="average", tag="mode"):
+def track_classification(video, inside=300, outside=600, threshold=5, pollen_score="average", tag="mode"):
 
     for track in video.tracks.values():
         _, start = track.start.center
