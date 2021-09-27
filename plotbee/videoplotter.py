@@ -115,7 +115,7 @@ def parts_drawer(frame_image, parts_dict):
     return frame_image
 
 
-def extract_body(frame, body, width=200, height=400, cX=None, cY=None, ignore_angle=False):
+def extract_body(frame, body, width=200, height=400, cX=None, cY=None, scale=1.0, ignore_angle=False):
     x, y = body.center
     
     if ignore_angle:
@@ -123,7 +123,7 @@ def extract_body(frame, body, width=200, height=400, cX=None, cY=None, ignore_an
     else:
         angle = body.angle
 
-    return rotate_bound2(frame,x,y,angle, width, height, cX, cY)
+    return rotate_bound2(frame,x,y,angle, width, height, cX, cY, scale)
 
 
 def track_drawer(frame, body, thickness=3, direction="forward"):

@@ -9,6 +9,7 @@ from functools import lru_cache
 from plotbee.body import Body
 import numpy as np
 import warnings
+import cv2
 
 
 class Frame():
@@ -189,7 +190,7 @@ class Frame():
         return rotate_bound2(self.image, x, y, angle, width, height, cX, cY)
     
     @staticmethod
-    def _extract_bodies_images(image, frame_data, width=None, height=None, cX=None, cY=None, suppression=False, min_parts=-1):
+    def _extract_bodies_images(image, frame_data, width=None, height=None, cX=None, cY=None, scale=None, suppression=False, min_parts=-1):
 
         if width is None:
             width = Body.width
@@ -199,6 +200,9 @@ class Frame():
             cX = Body.cX
         if cY is None:
             cY = Body.cY
+
+        if scale is None:
+            scale = Body.scale
         
         images =list()
         bodies = list()
@@ -211,7 +215,10 @@ class Frame():
             if len(body) < min_parts:
                 continue
             cbodyimg = extract_body(image, body, width=width, 
-                                    height=height, cX=cX, cY=cY)
+                                    height=height, cX=cX, cY=cY, scale=scale)
+
+            if Body.out_width is not None and Body.out_height is not None:
+                cbodyimg = cv2.resize(cbodyimg, (Body.out_height, Body.out_width))
             images.append(cbodyimg)
             bodies.append(body)
         return bodies, np.array(images)

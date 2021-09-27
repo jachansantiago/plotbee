@@ -107,7 +107,7 @@ def preprocess_input(image, rescale_factor=1):
     image = cv2.normalize(image,dst=image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     return image
 
-def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fraction, model_size=2048):
+def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fraction, model_size=2048, scale=1.0):
     
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"]=gpu
@@ -129,8 +129,13 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
     video = video_data.get_video_stream()
     data = list()
 
+    Body.scale = scale
+    
     Body.width=360
     Body.height=360
+
+    Body.out_width = 90
+    Body.out_height = 90
     
     for i, frame in enumerate(tqdm(video_data, desc=video_filename)):
         ret, im = video.read()
@@ -138,8 +143,7 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
             print("Something wrong with the video.")
         bodies, images = Frame._extract_bodies_images(im, frame)
         
-        images = [preprocess_input(im, rescale_factor=4) for im in images]
-        images = np.array(images)
+        images = np.array(images)/255.
 
         try:
             score=model.predict_on_batch(images)
@@ -156,7 +160,7 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
     
     return    
 
-def process_pollen(video, model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048):
+def process_pollen(video, model_path, model_weights, workers=4, gpus=["1", "0"], model_size=2048, scale=1.0):
     
     tmp_folder = "pollen_temp"
     os.makedirs(tmp_folder, exist_ok=True)
@@ -172,7 +176,7 @@ def process_pollen(video, model_path, model_weights, workers=4, gpus=["1", "0"],
     # Process each file with pollen classification
     for i, file in enumerate(filenames):
         gpu = gpus[i % len(gpus)]
-        processes[file] = mp.Process(target=tfv2_pollen_classifier,args= (file, model_path, model_weights, gpu, (1*len(gpus))/workers, model_size))
+        processes[file] = mp.Process(target=tfv2_pollen_classifier,args= (file, model_path, model_weights, gpu, (1*len(gpus))/workers, model_size, scale))
         processes[file].start()
 
     for k in processes:
@@ -951,8 +955,8 @@ class Video():
         
         return
     
-    def process_pollen(self,  model_path, weights=None, workers=4, gpus=["1", "0"], model_size=2048):
-        pollen_video = process_pollen(self, model_path, weights, workers=workers, gpus=gpus, model_size=model_size)
+    def process_pollen(self,  model_path, weights=None, workers=4, gpus=["1", "0"], model_size=2048, scale=1.0):
+        pollen_video = process_pollen(self, model_path, weights, workers=workers, gpus=gpus, model_size=model_size, scale=scale)
         
         self._frames = pollen_video._frames
         self._tracks = pollen_video._tracks

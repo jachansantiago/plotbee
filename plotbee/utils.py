@@ -164,7 +164,7 @@ def plot_bounding_box(frame, p, color):
     
     return frame
 
-def getRotationMatrix(image_size,x,y,angle, w,h, cX=None, cY=None):
+def getRotationMatrix(image_size,x,y,angle, w,h, cX=None, cY=None, scale=1.0):
     # grab the dimensions of the image and then determine the
     # center
     (h0, w0) = image_size
@@ -180,7 +180,7 @@ def getRotationMatrix(image_size,x,y,angle, w,h, cX=None, cY=None):
     # grab the rotation matrix (applying the negative of the
     # angle to rotate clockwise), then grab the sine and cosine
     # (i.e., the rotation components of the matrix)
-    M = cv2.getRotationMatrix2D((cX, cY), angle, 1.0) # angle in degrees
+    M = cv2.getRotationMatrix2D((cX, cY), angle, scale) # angle in degrees
     cos = np.abs(M[0, 0])
     sin = np.abs(M[0, 1])
   # adjust the rotation matrix to take into account translation
@@ -190,9 +190,9 @@ def getRotationMatrix(image_size,x,y,angle, w,h, cX=None, cY=None):
     return M
 
 
-def rotate_bound2(image,x,y,angle, w,h, cX=None, cY=None):
+def rotate_bound2(image,x,y,angle, w,h, cX=None, cY=None, scale=1.0):
     image_size = image.shape[:2]
-    M = getRotationMatrix(image_size,x,y,angle, w,h, cX, cY)
+    M = getRotationMatrix(image_size,x,y,angle, w,h, cX, cY, scale)
     # perform the actual rotation and return the image
     return cv2.warpAffine(image, M, (w, h), flags=cv2.WARP_INVERSE_MAP,borderMode=cv2.BORDER_REPLICATE)
 

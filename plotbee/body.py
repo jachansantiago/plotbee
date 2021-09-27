@@ -28,6 +28,9 @@ class Body():
     y_offset = 0
     width=200
     height=400
+    scale = 1.0
+    out_width=None
+    out_height=None
     pollen_thereshold = 0.5
     cX=None
     cY=None
@@ -151,7 +154,7 @@ class Body():
         else:
             return False
 
-    def _image(self, width=None, height=None, cX=None, cY=None, ignore_angle=None, erase_tag=False):
+    def _image(self, width=None, height=None, cX=None, cY=None, scale=None, ignore_angle=None, erase_tag=False):
 
         if width is None:
             width = Body.width
@@ -161,6 +164,8 @@ class Body():
             cX = Body.cX
         if cY is None:
             cY = Body.cY
+        if scale is None:
+            scale = Body.scale
         if ignore_angle is None:
             ignore_angle = Body.ignore_angle
 
@@ -171,9 +176,12 @@ class Body():
             frame = cv2.polylines(frame,[pts],True,(0,0,0),35)
         else:
             frame = self._frame.image
-
-        return extract_body(frame, self, width=width, 
-                            height=height, cX=cX, cY=cY, ignore_angle=ignore_angle)
+        
+        body_image = extract_body(frame, self, width=width, 
+                            height=height, cX=cX, cY=cY, scale=scale, ignore_angle=ignore_angle)
+        if Body.out_width is None and Body.out_height is None:
+            return body_image
+        return cv2.resize(body_image, (Body.out_height, Body.out_width))
 
     @property
     def image(self):
@@ -184,8 +192,12 @@ class Body():
         frame = self._frame.image    
         frame = skeleton_drawer(frame, self)
         
-        return extract_body(frame, self, width=Body.width, 
-                            height=Body.height, cX=Body.cX, cY=Body.cY)
+        body_image = extract_body(frame, self, width=Body.width, 
+                            height=Body.height, cX=Body.cX, cY=Body.cY, scale=Body.scale)
+        if Body.out_width is None and Body.out_height is None:
+            return body_image
+        return cv2.resize(body_image, (Body.out_height, Body.out_width))
+
 
 
     @property
