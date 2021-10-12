@@ -152,7 +152,7 @@ def tfv2_pollen_classifier(video_filename, model_path, weigths_path, gpu, gpu_fr
 #             print(frame)
             continue
         for body, pscore in zip(bodies, score):
-            body.pollen_score = float(pscore[1])
+            body.pollen_score = float(pscore[0])
 
     video.release()
     

@@ -60,13 +60,13 @@ def events(frame):
     plt.imshow(frame.event_image)
 
 
-def bbox_drawer(frame_image, body, idtext=False, idpos='avg', fontScale=1.5, fontThickness=3):
+def bbox_drawer(frame_image, body, idtext=False, idpos='avg', fontScale=1.5, fontThickness=3, linethick=7):
     color = id2color(body.id)
     font = cv2.FONT_HERSHEY_DUPLEX
     #fontScale = 1.5
     p1, p2, p3, p4 = body.boundingBox()
         
-    thick = 3 if body.virtual else 7   # Thin line if virtual
+    thick = 3 if body.virtual else linethick  # Thin line if virtual
     frame = cv2.line(frame_image, p1, p2, color=color, thickness=thick)
     frame = cv2.line(frame_image, p2, p3, color=color, thickness=thick)
     frame = cv2.line(frame_image, p3, p4, color=color, thickness=thick)
@@ -94,10 +94,10 @@ def bodies_bbox_drawer(frame_image, bodies, **kwargs):
     return frame_image
 
 
-def skeleton_drawer(frame_image, body, idtext=False):
+def skeleton_drawer(frame_image, body, idtext=False, thickness=7):
     color = id2color(body.id)
     for p1, p2 in body.skeleton:
-        frame_image = cv2.line(frame_image, p1, p2, color=color, thickness=7)
+        frame_image = cv2.line(frame_image, p1, p2, color=color, thickness=thickness)
     return frame_image
 
 def bodies_skeleton_drawer(frame_image, bodies, **kwargs):

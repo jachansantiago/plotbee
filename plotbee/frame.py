@@ -103,14 +103,14 @@ class Frame():
         frame_image = self.draw_frame_image(frame_image, **kwargs)
         return frame_image
 
-    def draw_frame_image(self, frame_image, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward", idtext=False, fontScale=1.5, fontThickness=3):
+    def draw_frame_image(self, frame_image, skeleton=False, bbox=False, tracks=False, events=False, min_parts=5, track_direction="forward", idtext=False, fontScale=1.5, fontThickness=3, thickness=7):
         filtered_bodies = [body for body in  self.bodies if len(body) >= min_parts]
 
         if bbox:
-            frame_image = bodies_bbox_drawer(frame_image, filtered_bodies, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness)
+            frame_image = bodies_bbox_drawer(frame_image, filtered_bodies, idtext=idtext, fontScale=fontScale, fontThickness=fontThickness, linethick=thickness)
 
         if skeleton:
-            frame_image = bodies_skeleton_drawer(frame_image, filtered_bodies)
+            frame_image = bodies_skeleton_drawer(frame_image, filtered_bodies, thickness=thickness)
 
         if tracks:
             frame_image = bodies_track_drawer(frame_image, filtered_bodies, direction=track_direction)
