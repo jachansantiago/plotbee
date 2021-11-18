@@ -9,8 +9,7 @@ Plotbee is a library to process, manage and visualize [Beepose](https://github.c
 ```
 git clone --recurse-submodules https://github.com/jachansantiago/plotbee.git
 cd plotbee
-pip install -r requirements.txt
-python setup.py install
+pip install . # or pip install .[tags] to install with apriltag
 ```
 
 ## Command Line
