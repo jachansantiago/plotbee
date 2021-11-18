@@ -1,13 +1,24 @@
-
-
-import apriltag.apriltagdetect as atd
-from apriltag.apriltagdetect import detectionsToObj
-import apriltag.apriltag as apriltag
 import cv2
 from tqdm import tqdm
 import numpy as np
-from concurrent import futures
-# from plotbee.body import Body
+
+try:
+    import apriltag.apriltagdetect as atd
+    from apriltag.apriltagdetect import detectionsToObj
+    import apriltag.apriltag as apriltag
+except ImportError:
+    _has_apriltag = False
+else:
+    _has_apriltag = True
+
+
+def requires_apriltag(func):
+    def wrapper():
+        if not _has_apriltag:
+            raise ImportError("apriltag is required to do this. plotbee with [tags] should be installed.\n\n pip install plotbee[tags]\n")
+        func()
+    return wrapper
+
 
 def dist(a, b):
     npa = np.array([a])
@@ -15,6 +26,7 @@ def dist(a, b):
 
     return np.sqrt(np.sum((npa - npb)**2))
 
+@requires_apriltag
 def tagDetector():
 
     options = atd.presets('tag25h5inv')
@@ -34,7 +46,6 @@ def tagDetector():
 def filter_corners(detections):
     filtered = [det for det in detections if det.tag_id != 15 and det.tag_id != 16]
     return filtered
-
 
 
 def detect_tags(det, image):
@@ -105,7 +116,7 @@ def detect_tags_on_video(video, max_workers=5):
             if len(tags) == 1:
                 body.tag = tags[0]
 
-
+@requires_apriltag
 def get_tag_image(body):
     tag_position = body.tag['p']
     image = body._frame.image
