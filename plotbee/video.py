@@ -24,7 +24,7 @@ from plotbee.track import Track
 from plotbee.utils import save_json, rescale_image
 from plotbee.tracking import hungarian_tracking, sort_tracking, non_max_supression_video, hungarian_tracking_with_prediction
 from plotbee.events import track_classification
-from plotbee.tag import detect_tags_on_video
+from plotbee.tag import detect_tags_on_video, detect_tags_on_video_frame_level
 from plotbee.video_wrapper import VideoCaptureWrapper
 # from plotbee.tag import match_tags
 from plotbee.videoplotter import extract_body
@@ -690,8 +690,11 @@ class Video():
     def track_clasification(self, **kwargs):
         track_classification(self, **kwargs)
 
-    def tag_detection(self, max_workers=5):
-        detect_tags_on_video(self, max_workers=max_workers)
+    def tag_detection(self, max_workers=5, frame_level=False):
+        if frame_level:
+            detect_tags_on_video_frame_level(self, max_workers=max_workers)
+        else:    
+            detect_tags_on_video(self, max_workers=max_workers)
 
     def events_counter(self):
         event_counter = defaultdict(int)

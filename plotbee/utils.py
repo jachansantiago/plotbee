@@ -44,7 +44,7 @@ def read_json(path):
 
 def save_json(path, data):
     with open(path, 'w') as outfile:
-        json.dump(data, outfile, indent=4)
+        json.dump(data, outfile)
 
 
 def hash1(i):

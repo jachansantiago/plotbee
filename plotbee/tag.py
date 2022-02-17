@@ -101,6 +101,11 @@ def detect_tags_on_frame(det, frame):
         match_tag2body(frame, tag)
     return
 
+def detect_tags_on_video_frame_level(video, max_workers=5):
+    det = tagDetector()
+    for frame in tqdm(video):
+        detect_tags_on_frame(det, frame)
+
 
 
 def detect_tags_on_video(video, max_workers=5):
