@@ -374,5 +374,56 @@ def video2analysis(video):
     tracks_csv = tracks2csv(video)
             
     return bodies_csv, tracks_csv
+
+
+def convert_labelbee(video):
+    labelbee_data = dict()
+    labelbee_data["info"] = {"type":"events-multiframe",
+                             "source":"Converted from Tracks v1 object"}
+    labelbee_data["data"] = dict()
+    for frame in video:
+        frame_anno = extract_frame_annotations(frame)
+        labelbee_data["data"][frame.id] = frame_anno
+    return labelbee_data
+
+def extract_frame_annotations(frame):
+    bodies_anno = list()
+    for body in frame:
+        body_anno = extract_body_annotation(body)
+        bodies_anno.append(body_anno)
+    return bodies_anno
+
+def extract_body_annotation(body):
+    entry = dict()
+    entry["id"] = body.id
+    entry["time"] = body.frameid/20
+    entry["frame"] = body.frameid
+    x, y = body.center
+    entry["x"] = x - 136.867/2
+    entry["y"] = y - 212.324/2
+    entry["cx"] = x - 136.867/2
+    entry["cy"] = y - 212.324/2
+    entry["width"] = 136.867
+    entry["height"] = 212.324
+    entry["angle"] = -body.angle + 180.0
+    entry["notes"] = ""
+    entry["labels"]= ""
+    parts = list()
+    for pid, keypoints in body.parts.items():
+        x, y = keypoints[0]
+        parts.append({"posFrame":{"x": x, "y":y}, "label":str(pid)})
+    entry["parts"] = parts
+    return entry
+
+
+def video2labelbee(video_fname, output_fname):
+    
+    video = Video.load(video_fname)
+    
+    labelbee_data = convert_labelbee(video)
+        
+    save_json(output_fname, labelbee_data)
+    
+    return
     
     

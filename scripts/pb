@@ -4,6 +4,7 @@ import os
 from plotbee.video import Video
 from plotbee.body import Body
 from plotbee.export import video2coco, sleap2pb, video2analysis
+from plotbee.export import video2labelbee
 
 # sub-command functions
 def tracking(args):
@@ -131,6 +132,7 @@ def export(args):
     pollen = args.pollen
     tags = args.tags
     coco = args.coco
+    labelbee = args.labelbee
     analysis = args.analysis
     images = args.images
     limit = args.size
@@ -159,6 +161,12 @@ def export(args):
     if coco:
         video2coco(input_filename, output_folder, image_extraction=images,
                      width=width, height=height)
+    if labelbee:
+        path, filename = os.path.split(input_filename)
+        filename, ext = os.path.splitext(filename)
+        output_filename = os.path.join(path, filename + "_labelbee.json")
+        print(output_filename)
+        video2labelbee(input_filename, output_filename)
 
     if analysis:
         print("Loading video data.")
@@ -251,6 +259,7 @@ datatype.add_argument('--pollen', action='store_true')
 datatype.add_argument('--tags', action='store_true')
 datatype.add_argument('--coco', action='store_true')
 datatype.add_argument('--analysis', action='store_true')
+datatype.add_argument('--labelbee', action='store_true')
 parser_export.set_defaults(func=export)
 
 #parse the args and call whatever function was selected
