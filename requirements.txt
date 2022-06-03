@@ -8,3 +8,4 @@ seaborn
 pandas
 scipy
 tensorflow>=2.3.0
+myst_parser
