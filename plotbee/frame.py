@@ -498,7 +498,7 @@ class Frame():
         :type bbox: bool, optional
         :param tracks: if `True` draws frame's detections tracks on the frame_image, defaults to False
         :type tracks: bool, optional
-        :param events: if `True` draws frame's detections events on the frame_image, defaults to False (see note below)
+        :param events: if `True` draws frame's detections events on the frame_image, defaults to False
         :type events: bool, optional
         :param min_parts: this functions only draws bodies that `len(body) >= min_parts`, defaults to -1
         :type min_parts: int, optional
