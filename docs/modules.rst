@@ -1,4 +1,4 @@
-plotbee_docs
+Reference
 ============
 
 .. toctree::

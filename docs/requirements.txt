@@ -11,3 +11,4 @@ scipy
 tensorflow>=2.3.0
 IPython
 ipywidgets
+nbsphinx
