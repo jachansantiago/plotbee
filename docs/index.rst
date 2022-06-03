@@ -5,7 +5,6 @@
 
 Welcome to plotbee's documentation!
 ===================================
-.. include:: README
    
 .. toctree::
    :maxdepth: 2
