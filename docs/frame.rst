@@ -1,10 +1,6 @@
 Frame Class
 ===============
 
-
-plotbee.frame module
---------------------
-
 .. automodule:: plotbee.frame
    :members:
    :undoc-members:
